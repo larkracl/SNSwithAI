@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "571403902471",
+    "project_id": "snswithai-29d1f",
+    "storage_bucket": "snswithai-29d1f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:571403902471:android:4a2d5a26651230da0f94a2",
+        "android_client_info": {
+          "package_name": "com.example.snswithai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqBzZRHuaNghKJr9bGEiU6Znxr_wMSxyY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
