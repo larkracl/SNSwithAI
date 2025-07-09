@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_comment_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="8dp"
+    android:paddingVertical="8dp"
+    android:background="#FFFFFF">
+
+    <!-- 부모 댓글 (기본 댓글) -->
+    <LinearLayout
+        android:id="@+id/layout_parent_comment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- 프로필 이미지 -->
+        <ImageView
+            android:id="@+id/img_comment_profile"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_profile_placeholder"
+            android:background="@drawable/bg_profile_circle"
+            android:scaleType="centerCrop" />
+
+        <!-- 댓글 내용 영역 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- 작성자 이름 + 시간 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tv_comment_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Username"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000" />
+
+                <TextView
+                    android:id="@+id/tv_comment_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2시간 전"
+                    android:textSize="12sp"
+                    android:textColor="#77AA77"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+
+            <!-- 댓글 내용 -->
+            <TextView
+                android:id="@+id/tv_comment_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="댓글 내용입니다."
+                android:textSize="14sp"
+                android:textColor="#333333"
+                android:layout_marginTop="2dp" />
+
+            <!-- 답글 달기 버튼 -->
+            <TextView
+                android:id="@+id/btn_reply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="답글 달기"
+                android:textSize="11sp"
+                android:textColor="#77AA77"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 대댓글 RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewReplies"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="40dp"
+        android:nestedScrollingEnabled="false"
+        android:visibility="gone" />
+</LinearLayout>

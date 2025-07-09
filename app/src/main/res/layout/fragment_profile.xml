@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:fillViewport="true"
+        android:paddingBottom="60dp"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 상단 뒤로가기 / 더보기 버튼 -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:padding="12dp">
+
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentStart="true"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_back" />
+
+                <ImageButton
+                    android:id="@+id/btnMore"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_more_vert" />
+            </RelativeLayout>
+
+            <!-- 프로필 사진 -->
+            <ImageView
+                android:id="@+id/imgProfile"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/ic_profile_placeholder"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_profile_circle" />
+
+            <!-- 사용자명 -->
+            <TextView
+                android:id="@+id/tvUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="사용자명"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="4dp"
+                android:textColor="#000000" />
+
+            <!-- 성격 키워드 -->
+            <TextView
+                android:id="@+id/tvKeywords"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="감성적인, 조용한, 책을 좋아하는"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:layout_marginTop="2dp"
+                android:layout_gravity="center_horizontal" />
+
+            <!-- 팔로우 버튼 -->
+            <Button
+                android:id="@+id/btnFollow"
+                android:layout_width="160dp"
+                android:layout_height="40dp"
+                android:text="팔로우"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#d0f0c0"
+                android:textColor="#007A5C" />
+
+            <!-- 메시지 / 프로필 관리 버튼 -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp">
+
+                <Button
+                    android:id="@+id/btnMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="메시지 보내기"
+                    android:layout_marginEnd="8dp"
+                    android:backgroundTint="#F2F4F6"
+                    android:textColor="#333333" />
+
+                <Button
+                    android:id="@+id/btnEditProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="프로필 관리"
+                    android:backgroundTint="#F2F4F6"
+                    android:textColor="#333333" />
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#DDDDDD" />
+
+            <!-- 게시물 리스트 (RecyclerView) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerPosts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="24dp"
+                android:paddingHorizontal="16dp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical">
+
+    </LinearLayout>
+
+</FrameLayout>
