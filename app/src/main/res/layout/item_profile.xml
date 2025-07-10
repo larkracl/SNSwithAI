@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/iv_profile"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/sample_avatar"
+    android:scaleType="centerCrop"
+    android:background="@drawable/bg_profile_circle" />
+
+    <TextView
+        android:id="@+id/tv_profile_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Name"
+    android:textSize="12sp"
+    android:textColor="#141712" />
+</LinearLayout>

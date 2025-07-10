@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <!-- 1. 스크롤 가능한 메인 콘텐츠 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- 1.1 상단 헤더 (뒤로가기 + 타이틀) -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:background="@null"
+                    android:src="@drawable/ic_arrow_back"
+                    android:contentDescription="Back" />
+
+                <TextView
+                    android:id="@+id/tvHeader"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:text="Following"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#141712"
+                    android:gravity="center" />
+
+                <!-- 오른쪽 공간 확보용 뷰 -->
+                <View
+                    android:layout_width="24dp"
+                    android:layout_height="0dp" />
+            </LinearLayout>
+
+            <!-- 1.2 “Followed” 섹션 타이틀 -->
+            <TextView
+                android:id="@+id/tvFollowedTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="4dp"
+                android:text="Followed"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#141712"/>
+
+            <!-- 1.3 Followed 예시 아이템 -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/ivAvatar1"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/sample_avatar"
+                    android:scaleType="centerCrop"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp">
+
+                    <TextView
+                        android:id="@+id/tvName1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sophia Ramirez"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="14sp"
+                        android:textColor="#141712"/>
+
+                    <TextView
+                        android:id="@+id/tvHandle1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@Sophia_R"
+                        android:fontFamily="sans-serif"
+                        android:textSize="12sp"
+                        android:textColor="#728665"/>
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnUnfollow1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:text="Unfollow"
+                    android:textSize="12sp"
+                    android:background="@drawable/bg_unfollow"
+                    android:textColor="#131910"/>
+            </LinearLayout>
+
+            <!-- 1.4 “Unfollowed” 섹션 타이틀 -->
+            <TextView
+                android:id="@+id/tvUnfollowedTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="4dp"
+                android:text="Unfollowed"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#141712"/>
+
+            <!-- 1.5 Unfollowed 예시 아이템 -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/ivAvatar2"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/sample_avatar"
+                    android:scaleType="centerCrop"/>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp">
+
+                    <TextView
+                        android:id="@+id/tvName2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chloe Davis"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="14sp"
+                        android:textColor="#141712"/>
+
+                    <TextView
+                        android:id="@+id/tvHandle2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@Chloe_D"
+                        android:fontFamily="sans-serif"
+                        android:textSize="12sp"
+                        android:textColor="#728665"/>
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnFollow2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:paddingLeft="12dp"
+                    android:paddingRight="12dp"
+                    android:text="Follow"
+                    android:textSize="12sp"
+                    android:background="@drawable/bg_bubble_outgoing"
+                    android:textColor="#FFFFFF"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>
