@@ -1,107 +1,67 @@
 package com.example.snswithai
 
-import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.snswithai.databinding.ActivityConversationBinding
-import com.example.snswithai.tts.ElevenLabsTtsClient
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.json.JSONObject
-import java.io.File
+import android.util.Log // Log import 추가
+import org.json.JSONObject // JSONObject import 추가
+
+// TtsManager import 추가
+import com.example.snswithai.JsonDataManager
+import com.example.snswithai.tts.TtsMessageListener
 
 class ConversationActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityConversationBinding
     private val conversationManager = ConversationManager()
 
-    // ① ElevenLabs API Key (공통)
-    private val elevenApiKey = "eleven-key"
-
-    // ② AI 번호(1,2,3)에 대응하는 voiceId 매핑
-    private val voiceIdMap = mapOf(
-        1 to "29vD33N1CtxCmqQRPOHJ",  // A
-        2 to "21m00Tcm4TlvDq8ikWAM",  // B
-        3 to "5Q0t7uMcjvnagumLfvZi"   // C
-    )
-
-    // ③ AI 번호별 TTS 클라이언트 생성
-    private val ttsClients: Map<Int, ElevenLabsTtsClient> by lazy {
-        voiceIdMap.mapValues { (_, vid) ->
-            ElevenLabsTtsClient(this, elevenApiKey, vid)
-        }
-    }
-
-    // ④ TTS용 코루틴 스코프
-    private val ttsScope = MainScope()
+    private lateinit var ttsListener: TtsMessageListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityConversationBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ttsListener = TtsMessageListener(this, "eleven-key")
+        JsonDataManager.registerListener(ttsListener)
+
         startConversation()
     }
-
     override fun onDestroy() {
         super.onDestroy()
-        // Activity 종료 시 코루틴 취소
-        ttsScope.cancel()
+        // ★ TTS 리스너 해제 & 자원 정리
+        JsonDataManager.unregisterListener(ttsListener)
+        ttsListener.destroy()
     }
-
     private fun startConversation() {
-        // 대화 시작 → onMessage, onJsonMessage 콜백 등록
-        ttsScope.launch {
+        CoroutineScope(Dispatchers.Main).launch {
             conversationManager.startConversation(
-                "대화 시작",  // 초기 프롬프트
-                onMessage = { msg ->
-                    Log.d("ConversationActivity", "Raw message: $msg")
+                "대화 시작", // initialPrompt
+                { message -> // onMessage 콜백: 이제 화면에 직접 출력하지 않고, 필요시 Logcat에만 출력
+                    Log.d("ConversationActivity", "Raw message received: $message") // 디버깅 용도로 유지
                 },
-                onJsonMessage = { jsonMessage ->
+                { jsonMessage -> // onJsonMessage 콜백: JSON 메시지를 파싱하여 출력
                     try {
-                        // 2) JSON 파싱
-                        val obj = JSONObject(jsonMessage)
-                        val aiNumber = obj.getInt("AI의 번호")               // 1,2,3
-                        val prompt   = obj.getString("대화 프롬프트")          // 대화 내용
-                        val display  = "AI $aiNumber: $prompt"
+                        val jsonObject = JSONObject(jsonMessage)
+                        val aiNumber = jsonObject.getInt("AI의 번호") // AI의 번호 가져오기
+                        val prompt = jsonObject.getString("대화 프롬프트") // 대화 프롬프트 가져오기
 
-                        // 3) 화면에 파싱된 메시지 출력
-                        runOnUiThread {
-                            binding.conversationLog.append("$display\n")
-                        }
-                        Log.d("ConversationActivity", display)
+                        val formattedMessage = "AI $aiNumber (JSON): $prompt"
+                        binding.conversationLog.append(formattedMessage + "\n") // JSON 파싱 결과만 화면에 출력, 줄바꿈 추가
+                        Log.d("JSON_Output_Parsed", formattedMessage) // 파싱된 메시지 Logcat 출력
 
-                        // 4) 해당 AI 번호의 TTS 클라이언트 선택
-                        val client = ttsClients[aiNumber] ?: ttsClients[1]!!
+                        // JSON을 JsonDataManager에 게시하면 TtsMessageListener가 받아서 음성 재생합니다
+                        JsonDataManager.postJsonMessage(jsonMessage)
 
-                        // 5) 음성 합성 & 재생
-                        ttsScope.launch {
-                            try {
-                                val mp3 = client.synthesize(prompt)
-                                playAudio(mp3)
-                            } catch (e: Exception) {
-                                Log.e("ConversationActivity", "TTS 오류", e)
-                            }
-                        }
                     } catch (e: Exception) {
-                        Log.e("ConversationActivity", "JSON 파싱 오류", e)
-                        runOnUiThread {
-                            binding.conversationLog.append("파싱 오류: ${e.message}\n")
-                        }
+                        Log.e("JSON_Parse_Error", "JSON 파싱 오류: $jsonMessage", e)
+                        binding.conversationLog.append("JSON 파싱 오류: ${e.message}\n") // 줄바꿈 추가
                     }
                 }
             )
-        }
-    }
-
-    /** MediaPlayer 로 비동기 재생 */
-    private fun playAudio(file: File) {
-        MediaPlayer().apply {
-            setDataSource(file.absolutePath)
-            prepareAsync()
-            setOnPreparedListener { it.start() }
-            setOnCompletionListener { it.release() }
         }
     }
 }
