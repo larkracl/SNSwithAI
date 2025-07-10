@@ -4,7 +4,6 @@ import android.util.Log
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay // delay import 추가
 import com.google.firebase.ai.type.content
-import com.google.firebase.ai.type.Content
 
 class ConversationManager {
 

@@ -18,11 +18,18 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        // 대화 테스트 버튼
         val conversationTestButton = findViewById<Button>(R.id.conversation_test_button)
         conversationTestButton.setOnClickListener {
             val intent = Intent(this, ConversationActivity::class.java)
             startActivity(intent)
         }
+
+        // 음성 테스트 버튼
+        val voiceTestButton = findViewById<Button>(R.id.voice_test_button)
+        voiceTestButton.setOnClickListener {
+            startActivity(Intent(this, VoiceTestActivity::class.java))
+        }
+
     }
 }
