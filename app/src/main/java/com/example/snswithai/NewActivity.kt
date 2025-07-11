@@ -44,8 +44,7 @@ class NewActivity : AppCompatActivity() {
 
     private val gson = Gson()
 
-    // TODO: 여기에 본인의 실제 Gemini API 키를 입력하세요.
-    private val GEMINI_API_KEY = "apikey"
+    private val IMG_API_KEY = BuildConfig.IMG_API_KEY
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
