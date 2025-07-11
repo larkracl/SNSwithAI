@@ -50,7 +50,10 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
     implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.firestore.ktx) // Add this line
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.ai) // Add this line
+    implementation("com.squareup.okhttp3:okhttp:5.1.0")
+    implementation("com.google.code.gson:gson:2.10.1") // For JSON parsing
 
     // testImplementation(libs.junit)
     // androidTestImplementation(libs.androidx.junit)
