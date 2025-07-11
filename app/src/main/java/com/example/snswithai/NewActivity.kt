@@ -22,7 +22,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.FileOutputStream
+import android.content.ContentValues
+import android.os.Build
+import android.provider.MediaStore
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
@@ -107,7 +109,7 @@ class NewActivity : AppCompatActivity() {
                         withContext(Dispatchers.Main) {
                             imageView.setImageBitmap(bitmap)
                             Toast.makeText(this@NewActivity, "이미지 생성 완료!", Toast.LENGTH_LONG).show()
-                            saveImageToInternalStorage(bitmap, "generated_image_${System.currentTimeMillis()}.jpg")
+                            saveImageToGallery(bitmap, "generated_image_${System.currentTimeMillis()}.jpg")
                         }
                     } else if (isActive) {
                         withContext(Dispatchers.Main) {
@@ -152,17 +154,41 @@ class NewActivity : AppCompatActivity() {
             null // 패턴을 찾지 못한 경우
         }
     }
+//이디다가 저장 하는지?
+            private fun saveImageToGallery(bitmap: Bitmap, displayName: String) {
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, displayName)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.Images.Media.IS_PENDING, 1)
+            }
+        }
 
-    private fun saveImageToInternalStorage(bitmap: Bitmap, fileName: String) {
-        try {
-            val outputStream: FileOutputStream = openFileOutput(fileName, MODE_PRIVATE)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-            outputStream.flush()
-            outputStream.close()
-            Log.d("NewActivity", "이미지를 내부 저장소에 저장했습니다: $fileName")
-            Toast.makeText(this, "이미지가 저장되었습니다.", Toast.LENGTH_SHORT).show()
-        } catch (e: IOException) {
-            Log.e("NewActivity", "이미지 저장 중 오류 발생", e)
+        val resolver = contentResolver
+        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+
+        uri?.let {
+            try {
+                resolver.openOutputStream(it)?.use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    values.clear()
+                    values.put(MediaStore.Images.Media.IS_PENDING, 0)
+                    resolver.update(it, values, null, null)
+                }
+
+                Log.d("NewActivity", "Image saved to gallery: $uri")
+                Toast.makeText(this, "갤러리에 저장되었습니다.", Toast.LENGTH_SHORT).show()
+
+            } catch (e: Exception) {
+                Log.e("NewActivity", "Error saving image to gallery", e)
+                Toast.makeText(this, "이미지 저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        } ?: run {
+            Log.e("NewActivity", "Failed to create MediaStore entry.")
+            Toast.makeText(this, "이미지 저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
         }
     }
 }

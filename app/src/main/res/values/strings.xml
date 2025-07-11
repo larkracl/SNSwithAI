@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">SNSwithAI</string>
-    <string name="generated_image_description">Generated Image</string>
-    <string name="image_generation_hint">Enter text for image generation</string>
+    <!-- Add your missing string resource here -->
+    <string name="generated_image_description">Generated image will appear here</string>
+    <!-- You might have other strings here -->
+    <string name="image_generation_hint">Enter a prompt to generate an image</string>
     <string name="generate_image_button_text">Generate Image</string>
 </resources>
+    

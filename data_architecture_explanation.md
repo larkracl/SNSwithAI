@@ -1,259 +1,333 @@
-# Android 앱 데이터 아키텍처: Entity, DAO, Repository
+# 데이터 아키텍처 설명 (Entity, DAO, Repository)
 
-Android 앱 개발에서 데이터 지속성(persistence)을 다룰 때, 특히 Room 데이터베이스와 함께 사용되는 일반적인 아키텍처 패턴입니다.
+이 문서는 "DB 스키마.md"에 정의된 Firebase Firestore 데이터베이스 구조를 기반으로, 안드로이드 애플리케이션의 데이터 계층을 구성하는 **Entity**, **DAO**, **Repository**에 대해 상세히 설명합니다.
 
-## 1. Entity (엔티티)
+## 1. 아키텍처 개요
 
-*   **역할:** 데이터베이스 테이블을 나타내는 클래스입니다. 각 엔티티 클래스는 데이터베이스의 한 테이블에 매핑되며, 클래스의 각 필드는 테이블의 한 열(column)에 해당합니다.
-*   **포함하는 내용:** 데이터 모델(POJO - Plain Old Java Object 또는 Kotlin Data Class)과 테이블 스키마 정의(예: `@Entity`, `@PrimaryKey`, `@ColumnInfo` 등의 Room 어노테이션).
-*   **예시:** 사용자 정보를 저장하는 `User` 엔티티, 게시물 정보를 저장하는 `Post` 엔티티 등.
+- **Entity (Data Class)**: Firestore의 각 컬렉션 문서(Document)를 Kotlin의 데이터 클래스로 매핑한 것입니다. Firestore의 필드와 1:1로 대응되며, 데이터의 구조를 정의합니다.
+- **DAO (Data Access Object)**: 데이터에 접근하기 위한 **인터페이스(Interface)**입니다. 어떤 데이터를 어떻게 가져오고, 저장하고, 수정하고, 삭제할지에 대한 **규칙(Contract)**을 정의합니다. 실제 구현은 Repository에서 이루어집니다.
+- **Repository**: DAO 인터페이스를 **구현(Implement)**하는 클래스입니다. 실제 Firebase Firestore SDK를 사용하여 데이터 통신을 수행하고, 비즈니스 로직을 처리합니다. ViewModel은 Repository를 통해 데이터에 접근하게 됩니다.
 
-## 2. DAO (Data Access Object - 데이터 접근 객체)
+---
 
-*   **역할:** 데이터베이스에 접근하여 데이터를 조작하는 메서드(쿼리)를 정의하는 인터페이스 또는 추상 클래스입니다. SQL 쿼리를 직접 작성하는 대신, DAO 인터페이스에 정의된 메서드를 호출하여 데이터베이스 작업을 수행합니다. Room 라이브러리가 이 인터페이스를 기반으로 실제 구현체를 자동으로 생성합니다.
-*   **포함하는 내용:** `@Insert`, `@Update`, `@Delete`, `@Query` 등의 Room 어노테이션과 함께 데이터 삽입, 업데이트, 삭제, 조회 등의 메서드 시그니처.
-*   **예시:** `UserDao`는 `insertUser()`, `getUserById()`, `getAllUsers()` 등의 메서드를 가질 수 있습니다.
+## 2. Entity (Data Class) 정의
 
-## 3. Repository (레포지토리)
+"DB 스키마.md"의 각 컬렉션은 아래와 같은 Kotlin 데이터 클래스로 정의됩니다.
 
-*   **역할:** 데이터 소스(예: 로컬 데이터베이스, 원격 서버 API, 캐시 등)에 대한 추상화 계층을 제공합니다. UI(ViewModel)는 직접 데이터 소스에 접근하지 않고 Repository를 통해 데이터를 요청합니다. Repository는 여러 데이터 소스(예: 네트워크에서 데이터를 가져오거나, 로컬 데이터베이스에서 데이터를 가져오는 등) 간의 데이터 충돌을 해결하고, 데이터 일관성을 유지하는 역할을 합니다.
-*   **포함하는 내용:** 하나 이상의 DAO 인스턴스, 네트워크 서비스 클라이언트, 그리고 이들을 사용하여 데이터를 가져오거나 저장하는 비즈니스 로직.
-*   **예시:** `UserRepository`는 `UserDao`를 사용하여 로컬 데이터베이스에서 사용자 정보를 가져오거나, 네트워크 API를 통해 서버에서 사용자 정보를 가져올 수 있습니다.
+**주요 규칙:**
+- `@DocumentId`: Firestore 문서의 고유 ID를 매핑하기 위해 사용합니다.
+- `@ServerTimestamp`: 서버의 시간을 기준으로 타임스탬프를 자동 기록하기 위해 사용합니다.
+- 필드 기본값: Firestore에서 데이터를 객체로 매핑할 때, 필드가 없는 경우를 대비해 안전하게 기본값을 지정합니다.
 
-### 이러한 아키텍처의 이점:
-
-*   **관심사 분리 (Separation of Concerns):** 각 계층이 명확한 역할과 책임을 가집니다.
-*   **테스트 용이성:** 각 계층을 독립적으로 테스트하기 용이합니다.
-*   **유지보수성:** 데이터 소스가 변경되더라도 Repository 계층만 수정하면 되므로, UI나 ViewModel 계층에 영향을 주지 않습니다.
-*   **확장성:** 새로운 데이터 소스를 추가하거나 기존 데이터 소스를 변경하기 용이합니다.
-
-## 데이터베이스 접근 (CRUD) 사용법 예시
-
-간단한 `User` 엔티티를 사용하여 데이터베이스에 접근(추가, 검색, 수정, 삭제)하는 방법을 예시로 설명합니다.
-
-### 1. Entity 정의 (User.kt)
-
+#### `User.kt`
 ```kotlin
-// app/src/main/java/com/example/snswithai/data/User.kt
-package com.example.snswithai.data
+import com.google.firebase.firestore.DocumentId
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity(tableName = "users")
 data class User(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val name: String,
-    val email: String
+    @DocumentId val id: String = "",
+    val email: String = "",
+    val name: String = "",
+    val profileImageUrl: String? = null
 )
 ```
 
-### 2. DAO 정의 (UserDao.kt)
-
+#### `Character.kt`
 ```kotlin
-// app/src/main/java/com/example/snswithai/data/UserDao.kt
-package com.example.snswithai.data
+import com.google.firebase.firestore.DocumentId
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
-import androidx.room.Delete
-import kotlinx.coroutines.flow.Flow
-
-@Dao
-interface UserDao {
-    @Insert
-    suspend fun insert(user: User)
-
-    @Query("SELECT * FROM users WHERE id = :userId")
-    fun getUserById(userId: Int): Flow<User>
-
-    @Query("SELECT * FROM users ORDER BY name ASC")
-    fun getAllUsers(): Flow<List<User>>
-
-    @Update
-    suspend fun update(user: User)
-
-    @Delete
-    suspend fun delete(user: User)
-}
+data class Character(
+    @DocumentId val id: String = "",
+    val name: String = "",
+    val description: String = ""
+)
 ```
 
-### 3. Repository 정의 (UserRepository.kt)
-
+#### `Relationship.kt`
 ```kotlin
-// app/src/main/java/com/example/snswithai/data/UserRepository.kt
-package com.example.snswithai.data
+import com.google.firebase.firestore.DocumentId
 
-import kotlinx.coroutines.flow.Flow
-
-class UserRepository(private val userDao: UserDao) {
-
-    suspend fun addUser(user: User) {
-        userDao.insert(user)
-    }
-
-    fun getUser(id: Int): Flow<User> {
-        return userDao.getUserById(id)
-    }
-
-    fun getAllUsers(): Flow<List<User>> {
-        return userDao.getAllUsers()
-    }
-
-    suspend fun updateUser(user: User) {
-        userDao.update(user)
-    }
-
-    suspend fun deleteUser(user: User) {
-        userDao.delete(user)
-    }
-}
+data class Relationship(
+    @DocumentId val id: String = "",
+    val userId: String = "",
+    val characterId: String = "",
+    val status: String = "", // "customized", "using_default", "not_using"
+    val customName: String? = null,
+    val customDescription: String? = null
+)
 ```
 
-### 4. 데이터베이스 (AppDatabase.kt)
-
+#### `ChatRoom.kt`
 ```kotlin
-// app/src/main/java/com/example/snswithai/data/AppDatabase.kt
-package com.example.snswithai.data
+import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.ServerTimestamp
+import java.util.Date
 
-import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+data class ChatRoom(
+    @DocumentId val id: String = "",
+    val members: List<String> = emptyList(), // [userId, characterId]
+    val name: String = "",
+    @ServerTimestamp val createdAt: Date? = null
+)
+```
 
-@Database(entities = [User::class], version = 1, exportSchema = false)
-abstract class AppDatabase : RoomDatabase() {
-    abstract fun userDao(): UserDao
+#### `ChatMessage.kt`
+```kotlin
+import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.ServerTimestamp
+import java.util.Date
 
-    companion object {
-        @Volatile
-        private var INSTANCE: AppDatabase? = null
+data class ChatMessage(
+    @DocumentId val id: String = "",
+    val chatRoomId: String = "",
+    val senderId: String = "",
+    val content: String = "",
+    @ServerTimestamp val timestamp: Date? = null
+)
+```
 
-        fun getDatabase(context: Context): AppDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    "app_database"
-                ).build()
-                INSTANCE = instance
-                instance
-            }
+#### `TimelinePost.kt`
+```kotlin
+import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.ServerTimestamp
+import java.util.Date
+
+data class TimelinePost(
+    @DocumentId val id: String = "",
+    val ownerId: String = "", // 타임라인 소유자 ID
+    val authorId: String = "", // 실제 작성자 ID
+    val authorType: String = "", // "user" or "character"
+    val content: String = "",
+    val imageUrl: String? = null,
+    val likeCount: Int = 0,
+    val commentCount: Int = 0,
+    @ServerTimestamp val createdAt: Date? = null
+)
+```
+
+#### `TimelineComment.kt`
+```kotlin
+import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.ServerTimestamp
+import java.util.Date
+
+data class TimelineComment(
+    @DocumentId val id: String = "",
+    val ownerId: String = "",
+    val postId: String = "",
+    val authorId: String = "",
+    val content: String = "",
+    val likeCount: Int = 0,
+    val parentCommentId: String? = null, // 대댓글인 경우 부모 댓글 ID
+    @ServerTimestamp val createdAt: Date? = null
+)
+```
+
+#### `PostLike.kt`
+```kotlin
+import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.ServerTimestamp
+import java.util.Date
+
+data class PostLike(
+    @DocumentId val id: String = "",
+    val postId: String = "",
+    val likedByUserId: String = "",
+    @ServerTimestamp val createdAt: Date? = null
+)
+```
+
+#### `CommentLike.kt`
+```kotlin
+import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.ServerTimestamp
+import java.util.Date
+
+data class CommentLike(
+    @DocumentId val id: String = "",
+    val commentId: String = "",
+    val likedByUserId: String = "",
+    @ServerTimestamp val createdAt: Date? = null
+)
+```
+
+#### `Call.kt`
+```kotlin
+import com.google.firebase.firestore.DocumentId
+import java.util.Date
+
+data class Call(
+    @DocumentId val id: String = "",
+    val userId: String = "",
+    val characterId: String = "",
+    val startTime: Date? = null,
+    val endTime: Date? = null
+)
+```
+
+#### `CallUtterance.kt`
+```kotlin
+import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.ServerTimestamp
+import java.util.Date
+
+data class CallUtterance(
+    @DocumentId val id: String = "",
+    val callId: String = "",
+    val speaker: String = "", // "user" or "character"
+    val text: String = "",
+    @ServerTimestamp val timestamp: Date? = null
+)
+```
+
+---
+
+## 3. DAO (Data Access Object) 정의
+
+DAO는 각 Entity에 대한 CRUD(Create, Read, Update, Delete) 작업을 정의하는 인터페이스입니다. `Flow`를 사용하여 데이터 변경을 실시간으로 감지하고 UI에 반영할 수 있도록 설계합니다.
+
+#### 예시: `TimelineDao.kt`
+```kotlin
+import kotlinx.coroutines.flow.Flow
+
+interface TimelineDao {
+    // 특정 사용자의 타임라인 게시물 목록을 실시간으로 가져오기
+    fun getTimelinePosts(ownerId: String): Flow<List<TimelinePost>>
+
+    // 특정 게시물의 댓글 목록을 실시간으로 가져오기
+    fun getComments(postId: String): Flow<List<TimelineComment>>
+
+    // 새 게시물 추가
+    suspend fun addPost(post: TimelinePost)
+
+    // 게시물 삭제
+    suspend fun deletePost(postId: String)
+
+    // 게시물 좋아요 추가/삭제 (Transaction)
+    suspend fun togglePostLike(postId: String, userId: String)
+}
+```
+> 이와 같은 방식으로 `UserDao`, `CharacterDao`, `ChatDao` 등 다른 데이터 모델에 대한 DAO 인터페이스를 각각 정의합니다.
+
+---
+
+## 4. Repository 정의
+
+Repository는 DAO 인터페이스의 실제 구현체입니다. Firebase SDK를 사용하여 비동기 데이터 작업을 수행합니다.
+
+#### 예시: `TimelineRepository.kt`
+```kotlin
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
+
+class TimelineRepository(
+    private val firestore: FirebaseFirestore
+) : TimelineDao {
+
+    override fun getTimelinePosts(ownerId: String): Flow<List<TimelinePost>> {
+        val collection = firestore.collection("timelinePosts")
+            .whereEqualTo("ownerId", ownerId)
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+
+        // collection.snapshots()는 실시간 변경을 감지하는 Flow를 반환
+        return collection.snapshots().map { snapshot ->
+            snapshot.toObjects(TimelinePost::class.java)
         }
     }
+
+    override fun getComments(postId: String): Flow<List<TimelineComment>> {
+        val collection = firestore.collection("timelineComments")
+            .whereEqualTo("postId", postId)
+            .orderBy("createdAt", Query.Direction.ASCENDING)
+
+        return collection.snapshots().map { snapshot ->
+            snapshot.toObjects(TimelineComment::class.java)
+        }
+    }
+
+    override suspend fun addPost(post: TimelinePost) {
+        firestore.collection("timelinePosts").add(post).await()
+    }
+
+    override suspend fun deletePost(postId: String) {
+        firestore.collection("timelinePosts").document(postId).delete().await()
+    }
+
+    override suspend fun togglePostLike(postId: String, userId: String) {
+        // 실제 구현 시에는 Transaction을 사용하여 likeCount 업데이트와
+        // postLikes 컬렉션에 문서 추가/삭제를 원자적으로 처리해야 함
+    }
 }
 ```
 
-### 5. ViewModel에서 Repository 사용 예시
+이러한 구조를 통해 데이터 로직을 UI 코드로부터 분리하여, 더 깔끔하고 테스트하기 쉬우며 유지보수가 용이한 애플리케이션을 만들 수 있습니다.
 
+---
+
+## 5. ViewModel에서의 Repository 사용 예시
+
+ViewModel은 Repository를 주입받아 UI에 필요한 데이터를 요청하고, UI 상태를 관리합니다. Hilt와 같은 의존성 주입 라이브러리를 사용하면 이 과정을 쉽게 관리할 수 있습니다.
+
+#### 예시: `TimelineViewModel.kt`
 ```kotlin
-// app/src/main/java/com/example/snswithai/ui/UserViewModel.kt
-package com.example.snswithai.ui
-
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.snswithai.data.User
-import com.example.snswithai.data.UserRepository
-import kotlinx.coroutines.flow.Flow
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class UserViewModel(private val repository: UserRepository) : ViewModel() {
+@HiltViewModel
+class TimelineViewModel @Inject constructor(
+    private val timelineRepository: TimelineRepository // Hilt를 통해 Repository 주입
+) : ViewModel() {
 
-    val allUsers: Flow<List<User>> = repository.getAllUsers()
+    // 현재 로그인한 사용자의 ID (실제로는 AuthService 등에서 가져와야 함)
+    private val currentUserId = "test_user_id"
 
-    fun insertUser(user: User) = viewModelScope.launch {
-        repository.addUser(user)
-    }
+    // 타임라인 게시물 목록을 StateFlow로 관리하여 UI에 실시간으로 제공
+    val posts = timelineRepository.getTimelinePosts(currentUserId)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
-    fun getUserById(id: Int): Flow<User> {
-        return repository.getUser(id)
-    }
-
-    fun updateUser(user: User) = viewModelScope.launch {
-        repository.updateUser(user)
-    }
-
-    fun deleteUser(user: User) = viewModelScope.launch {
-        repository.deleteUser(user)
-    }
-}
-
-class UserViewModelFactory(private val repository: UserRepository) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(UserViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return UserViewModel(repository) as T
+    // 새 게시물을 추가하는 함수
+    fun onAddPost(content: String) {
+        viewModelScope.launch {
+            val newPost = TimelinePost(
+                ownerId = currentUserId,
+                authorId = currentUserId,
+                authorType = "user",
+                content = content
+            )
+            timelineRepository.addPost(newPost)
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
 ```
 
-### 6. Activity/Fragment에서 ViewModel 사용 예시
-
+#### UI (Composable 함수)에서의 사용
 ```kotlin
-// app/src/main/java/com/example/snswithai/MainActivity.kt (예시)
-package com.example.snswithai
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 
-import android.os.Bundle
-import android.util.Log
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import com.example.snswithai.data.AppDatabase
-import com.example.snswithai.data.User
-import com.example.snswithai.data.UserRepository
-import com.example.snswithai.ui.UserViewModel
-import com.example.snswithai.ui.UserViewModelFactory
-import kotlinx.coroutines.launch
+@Composable
+fun TimelineScreen(viewModel: TimelineViewModel = hiltViewModel()) {
+    // ViewModel의 StateFlow를 구독하여 데이터 변경 시 자동으로 UI를 다시 그림
+    val posts by viewModel.posts.collectAsState()
 
-class MainActivity : AppCompatActivity() {
-
-    private val userViewModel: UserViewModel by viewModels {
-        UserViewModelFactory(UserRepository(AppDatabase.getDatabase(this).userDao()))
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main) // Hello World 화면
-
-        // 예시: 사용자 추가
-        lifecycleScope.launch {
-            val newUser = User(name = "John Doe", email = "john.doe@example.com")
-            userViewModel.insertUser(newUser)
-            Log.d("DB_EXAMPLE", "User added: ${newUser.name}")
-        }
-
-        // 예시: 모든 사용자 검색
-        lifecycleScope.launch {
-            userViewModel.allUsers.collect { users ->
-                Log.d("DB_EXAMPLE", "All users: $users")
-            }
-        }
-
-        // 예시: 특정 사용자 검색 (ID 1번 사용자)
-        lifecycleScope.launch {
-            userViewModel.getUserById(1).collect { user ->
-                if (user != null) {
-                    Log.d("DB_EXAMPLE", "User with ID 1: ${user.name}")
-                    // 예시: 사용자 수정
-                    val updatedUser = user.copy(name = "Jane Doe")
-                    userViewModel.updateUser(updatedUser)
-                    Log.d("DB_EXAMPLE", "User updated: ${updatedUser.name}")
-                }
-            }
-        }
-
-        // 예시: 사용자 삭제 (ID 1번 사용자)
-        lifecycleScope.launch {
-            // 실제 앱에서는 사용자 ID를 통해 User 객체를 먼저 가져와야 합니다.
-            // 여기서는 예시를 위해 임시 User 객체를 생성합니다.
-            val userToDelete = User(id = 1, name = "Jane Doe", email = "john.doe@example.com")
-            userViewModel.deleteUser(userToDelete)
-            Log.d("DB_EXAMPLE", "User deleted: ${userToDelete.name}")
+    // posts를 사용하여 UI 목록을 표시
+    LazyColumn {
+        items(posts) { post ->
+            Text(text = post.content)
         }
     }
 }
+```
