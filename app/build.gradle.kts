@@ -1,7 +1,7 @@
 import java.util.Properties
 
-// ① app 모듈 내부(.app 디렉터리)에 있는 .env 파일 로드
-val envFile = projectDir.resolve(".env")
+// ① app 모듈 내부(.app 디렉터리)에 있는 env 파일 로드
+val envFile = projectDir.resolve("env")
 val envProps = Properties().apply {
     if (envFile.exists()) load(envFile.inputStream())
 }
