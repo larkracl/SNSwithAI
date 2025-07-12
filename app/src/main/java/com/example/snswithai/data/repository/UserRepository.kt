@@ -1,26 +1,26 @@
 package com.example.snswithai.data.repository
 
 import com.example.snswithai.data.local.db.entity.User
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
 
-class UserRepository(private val db: FirebaseFirestore) {
+class UserRepository(private val db: FirebaseDatabase) {
 
-    private val usersCollection = db.collection("users")
+    private val usersRef = db.getReference("users")
 
     suspend fun createUser(user: User) {
-        usersCollection.document(user.userId).set(user).await()
+        usersRef.child(user.userId).setValue(user).await()
     }
 
     suspend fun getUser(userId: String): User? {
-        return usersCollection.document(userId).get().await().toObject(User::class.java)
+        return usersRef.child(userId).get().await().getValue(User::class.java)
     }
 
     suspend fun updateUser(user: User) {
-        usersCollection.document(user.userId).set(user).await()
+        usersRef.child(user.userId).setValue(user).await()
     }
 
     suspend fun deleteUser(userId: String) {
-        usersCollection.document(userId).delete().await()
+        usersRef.child(userId).removeValue().await()
     }
 }

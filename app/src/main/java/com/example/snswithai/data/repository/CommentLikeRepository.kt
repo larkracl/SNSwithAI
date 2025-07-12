@@ -1,37 +1,27 @@
 package com.example.snswithai.data.repository
 
 import com.example.snswithai.data.local.db.entity.CommentLike
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
 
-class CommentLikeRepository(private val db: FirebaseFirestore) {
+class CommentLikeRepository(private val db: FirebaseDatabase) {
 
-    private val commentLikesCollection = db.collection("commentLikes")
+    private val commentLikesRef = db.getReference("commentLikes")
 
-    suspend fun createCommentLike(commentLike: CommentLike) {
-        commentLikesCollection.document(commentLike.likeId).set(commentLike).await()
+    suspend fun addLikeToComment(like: CommentLike) {
+        commentLikesRef.child(like.likeId).setValue(like).await()
     }
 
-    suspend fun getCommentLike(likeId: String): CommentLike? {
-        return commentLikesCollection.document(likeId).get().await().toObject(CommentLike::class.java)
+    suspend fun removeLikeFromComment(likeId: String) {
+        commentLikesRef.child(likeId).removeValue().await()
     }
 
-    suspend fun deleteCommentLike(likeId: String) {
-        commentLikesCollection.document(likeId).delete().await()
+    suspend fun getLikesForComment(commentId: String): List<CommentLike> {
+        return commentLikesRef.orderByChild("commentId").equalTo(commentId).get().await().children.mapNotNull { it.getValue(CommentLike::class.java) }
     }
 
-    suspend fun getCommentLikesForComment(commentId: String): List<CommentLike> {
-        return commentLikesCollection.whereEqualTo("commentId", commentId).get().await().toObjects(CommentLike::class.java)
-    }
-
-    suspend fun getCommentLikeByUserAndComment(userId: String, commentId: String): CommentLike? {
-        return commentLikesCollection
-            .whereEqualTo("likedByUserId", userId)
-            .whereEqualTo("commentId", commentId)
-            .get()
-            .await()
-            .documents
-            .firstOrNull()
-            ?.toObject(CommentLike::class.java)
+    suspend fun hasUserLikedComment(userId: String, commentId: String): Boolean {
+        val snapshot = commentLikesRef.orderByChild("userId_commentId").equalTo("${userId}_${commentId}").get().await()
+        return snapshot.exists()
     }
 }

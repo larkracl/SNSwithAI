@@ -1,41 +1,41 @@
 package com.example.snswithai.data.repository
 
 import com.example.snswithai.data.local.db.entity.Relationship
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
 
-class RelationshipRepository(private val db: FirebaseFirestore) {
+class RelationshipRepository(private val db: FirebaseDatabase) {
 
-    private val relationshipsCollection = db.collection("relationships")
+    private val relationshipsRef = db.getReference("relationships")
 
     suspend fun createRelationship(relationship: Relationship) {
-        relationshipsCollection.document(relationship.relationshipId).set(relationship).await()
+        relationshipsRef.child(relationship.relationshipId).setValue(relationship).await()
     }
 
     suspend fun getRelationship(relationshipId: String): Relationship? {
-        return relationshipsCollection.document(relationshipId).get().await().toObject(Relationship::class.java)
+        return relationshipsRef.child(relationshipId).get().await().getValue(Relationship::class.java)
     }
 
     suspend fun updateRelationship(relationship: Relationship) {
-        relationshipsCollection.document(relationship.relationshipId).set(relationship).await()
+        relationshipsRef.child(relationship.relationshipId).setValue(relationship).await()
     }
 
     suspend fun deleteRelationship(relationshipId: String) {
-        relationshipsCollection.document(relationshipId).delete().await()
+        relationshipsRef.child(relationshipId).removeValue().await()
     }
 
     suspend fun getRelationshipsForUser(userId: String): List<Relationship> {
-        return relationshipsCollection.whereEqualTo("userId", userId).get().await().toObjects(Relationship::class.java)
+        return relationshipsRef.orderByChild("userId").equalTo(userId).get().await().children.mapNotNull { it.getValue(Relationship::class.java) }
     }
 
     suspend fun getRelationshipByUserAndCharacter(userId: String, characterId: String): Relationship? {
-        return relationshipsCollection
-            .whereEqualTo("userId", userId)
-            .whereEqualTo("characterId", characterId)
+        return relationshipsRef
+            .orderByChild("userId_characterId")
+            .equalTo("${userId}_${characterId}")
             .get()
             .await()
-            .documents
+            .children
             .firstOrNull()
-            ?.toObject(Relationship::class.java)
+            ?.getValue(Relationship::class.java)
     }
 }

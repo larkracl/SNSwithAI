@@ -1,30 +1,30 @@
 package com.example.snswithai.data.repository
 
 import com.example.snswithai.data.local.db.entity.Call
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
 
-class CallRepository(private val db: FirebaseFirestore) {
+class CallRepository(private val db: FirebaseDatabase) {
 
-    private val callsCollection = db.collection("calls")
+    private val callsRef = db.getReference("calls")
 
     suspend fun createCall(call: Call) {
-        callsCollection.document(call.callId).set(call).await()
+        callsRef.child(call.callId).setValue(call).await()
     }
 
     suspend fun getCall(callId: String): Call? {
-        return callsCollection.document(callId).get().await().toObject(Call::class.java)
+        return callsRef.child(callId).get().await().getValue(Call::class.java)
     }
 
     suspend fun updateCall(call: Call) {
-        callsCollection.document(call.callId).set(call).await()
+        callsRef.child(call.callId).setValue(call).await()
     }
 
     suspend fun deleteCall(callId: String) {
-        callsCollection.document(callId).delete().await()
+        callsRef.child(callId).removeValue().await()
     }
 
     suspend fun getCallsForUser(userId: String): List<Call> {
-        return callsCollection.whereEqualTo("userId", userId).orderBy("startTime", com.google.firebase.firestore.Query.Direction.DESCENDING).get().await().toObjects(Call::class.java)
+        return callsRef.orderByChild("userId").equalTo(userId).get().await().children.mapNotNull { it.getValue(Call::class.java) }
     }
 }

@@ -13,8 +13,7 @@ import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
+import com.google.firebase.database.FirebaseDatabase
 
 class LoginActivity : AppCompatActivity() {
 
@@ -87,7 +86,7 @@ class LoginActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     val user = auth.currentUser
-                    user?.let { saveUserToFirestore(it) }
+                    user?.let { saveUserToDatabase(it) }
                     Toast.makeText(this, "Authentication successful.", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
@@ -99,16 +98,16 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    private fun saveUserToFirestore(firebaseUser: com.google.firebase.auth.FirebaseUser) {
-        val db = FirebaseFirestore.getInstance()
+    private fun saveUserToDatabase(firebaseUser: com.google.firebase.auth.FirebaseUser) {
+        val db = FirebaseDatabase.getInstance()
         val user = hashMapOf(
             "email" to firebaseUser.email,
             "name" to firebaseUser.displayName,
             "profileImageUrl" to firebaseUser.photoUrl.toString()
         )
 
-        db.collection("users").document(firebaseUser.uid)
-            .set(user, SetOptions.merge()) // Use merge to avoid overwriting existing data
+        db.getReference("users").child(firebaseUser.uid)
+            .setValue(user)
             .addOnSuccessListener { 
                 // Optional: Handle success, e.g., log or show a toast
             }

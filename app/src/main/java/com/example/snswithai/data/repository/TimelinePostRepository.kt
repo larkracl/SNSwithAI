@@ -1,47 +1,47 @@
 package com.example.snswithai.data.repository
 
 import com.example.snswithai.data.local.db.entity.TimelinePost
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FieldValue
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ServerValue
 import kotlinx.coroutines.tasks.await
 
-class TimelinePostRepository(private val db: FirebaseFirestore) {
+class TimelinePostRepository(private val db: FirebaseDatabase) {
 
-    private val timelinePostsCollection = db.collection("timelinePosts")
+    private val timelinePostsRef = db.getReference("timelinePosts")
 
     suspend fun createTimelinePost(post: TimelinePost) {
-        timelinePostsCollection.document(post.postId).set(post).await()
+        timelinePostsRef.child(post.postId).setValue(post).await()
     }
 
     suspend fun getTimelinePost(postId: String): TimelinePost? {
-        return timelinePostsCollection.document(postId).get().await().toObject(TimelinePost::class.java)
+        return timelinePostsRef.child(postId).get().await().getValue(TimelinePost::class.java)
     }
 
     suspend fun updateTimelinePost(post: TimelinePost) {
-        timelinePostsCollection.document(post.postId).set(post).await()
+        timelinePostsRef.child(post.postId).setValue(post).await()
     }
 
     suspend fun deleteTimelinePost(postId: String) {
-        timelinePostsCollection.document(postId).delete().await()
+        timelinePostsRef.child(postId).removeValue().await()
     }
 
     suspend fun getTimelinePostsForUser(userId: String): List<TimelinePost> {
-        return timelinePostsCollection.whereEqualTo("userId", userId).orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING).get().await().toObjects(TimelinePost::class.java)
+        return timelinePostsRef.orderByChild("userId").equalTo(userId).get().await().children.mapNotNull { it.getValue(TimelinePost::class.java) }
     }
 
     suspend fun incrementLikeCount(postId: String) {
-        timelinePostsCollection.document(postId).update("likeCount", FieldValue.increment(1)).await()
+        timelinePostsRef.child(postId).child("likeCount").setValue(ServerValue.increment(1)).await()
     }
 
     suspend fun decrementLikeCount(postId: String) {
-        timelinePostsCollection.document(postId).update("likeCount", FieldValue.increment(-1)).await()
+        timelinePostsRef.child(postId).child("likeCount").setValue(ServerValue.increment(-1)).await()
     }
 
     suspend fun incrementCommentCount(postId: String) {
-        timelinePostsCollection.document(postId).update("commentCount", FieldValue.increment(1)).await()
+        timelinePostsRef.child(postId).child("commentCount").setValue(ServerValue.increment(1)).await()
     }
 
     suspend fun decrementCommentCount(postId: String) {
-        timelinePostsCollection.document(postId).update("commentCount", FieldValue.increment(-1)).await()
+        timelinePostsRef.child(postId).child("commentCount").setValue(ServerValue.increment(-1)).await()
     }
 }

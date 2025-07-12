@@ -30,6 +30,9 @@ android {
         val imgApiKey = localProperties.getProperty("IMG_API_KEY", "")
         buildConfigField("String", "IMG_API_KEY", "\"$imgApiKey\"")
     }
+    buildFeatures{
+        buildConfig = true
+    }
 
     buildTypes {
         release {
@@ -62,7 +65,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
     implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.firestore.ktx)
+    implementation("com.google.firebase:firebase-database-ktx")
     implementation(libs.firebase.ai) // Add this line
     implementation("com.squareup.okhttp3:okhttp:5.1.0")
     implementation("com.google.code.gson:gson:2.10.1") // For JSON parsing

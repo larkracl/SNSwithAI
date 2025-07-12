@@ -1,41 +1,41 @@
 package com.example.snswithai.data.repository
 
 import com.example.snswithai.data.local.db.entity.ChatRoom
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
 
-class ChatRoomRepository(private val db: FirebaseFirestore) {
+class ChatRoomRepository(private val db: FirebaseDatabase) {
 
-    private val chatRoomsCollection = db.collection("chatRooms")
+    private val chatRoomsRef = db.getReference("chatRooms")
 
     suspend fun createChatRoom(chatRoom: ChatRoom) {
-        chatRoomsCollection.document(chatRoom.chatRoomId).set(chatRoom).await()
+        chatRoomsRef.child(chatRoom.chatRoomId).setValue(chatRoom).await()
     }
 
     suspend fun getChatRoom(chatRoomId: String): ChatRoom? {
-        return chatRoomsCollection.document(chatRoomId).get().await().toObject(ChatRoom::class.java)
+        return chatRoomsRef.child(chatRoomId).get().await().getValue(ChatRoom::class.java)
     }
 
     suspend fun updateChatRoom(chatRoom: ChatRoom) {
-        chatRoomsCollection.document(chatRoom.chatRoomId).set(chatRoom).await()
+        chatRoomsRef.child(chatRoom.chatRoomId).setValue(chatRoom).await()
     }
 
     suspend fun deleteChatRoom(chatRoomId: String) {
-        chatRoomsCollection.document(chatRoomId).delete().await()
+        chatRoomsRef.child(chatRoomId).removeValue().await()
     }
 
     suspend fun getChatRoomsForUser(userId: String): List<ChatRoom> {
-        return chatRoomsCollection.whereArrayContains("members", userId).get().await().toObjects(ChatRoom::class.java)
+        return chatRoomsRef.orderByChild("members/$userId").equalTo(true).get().await().children.mapNotNull { it.getValue(ChatRoom::class.java) }
     }
 
     suspend fun getChatRoomByUserAndCharacter(userId: String, characterId: String): ChatRoom? {
-        return chatRoomsCollection
-            .whereEqualTo("userId", userId)
-            .whereEqualTo("characterId", characterId)
+        return chatRoomsRef
+            .orderByChild("userId_characterId")
+            .equalTo("${userId}_${characterId}")
             .get()
             .await()
-            .documents
+            .children
             .firstOrNull()
-            ?.toObject(ChatRoom::class.java)
+            ?.getValue(ChatRoom::class.java)
     }
 }

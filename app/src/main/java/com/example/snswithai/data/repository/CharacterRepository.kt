@@ -1,26 +1,30 @@
 package com.example.snswithai.data.repository
 
 import com.example.snswithai.data.local.db.entity.Character
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
 
-class CharacterRepository(private val db: FirebaseFirestore) {
+class CharacterRepository(private val db: FirebaseDatabase) {
 
-    private val charactersCollection = db.collection("characters")
+    private val charactersRef = db.getReference("characters")
 
     suspend fun createCharacter(character: Character) {
-        charactersCollection.document(character.characterId).set(character).await()
+        charactersRef.child(character.characterId).setValue(character).await()
     }
 
     suspend fun getCharacter(characterId: String): Character? {
-        return charactersCollection.document(characterId).get().await().toObject(Character::class.java)
+        return charactersRef.child(characterId).get().await().getValue(Character::class.java)
     }
 
     suspend fun updateCharacter(character: Character) {
-        charactersCollection.document(character.characterId).set(character).await()
+        charactersRef.child(character.characterId).setValue(character).await()
     }
 
     suspend fun deleteCharacter(characterId: String) {
-        charactersCollection.document(characterId).delete().await()
+        charactersRef.child(characterId).removeValue().await()
+    }
+
+    suspend fun getCharactersForUser(userId: String): List<Character> {
+        return charactersRef.orderByChild("userId").equalTo(userId).get().await().children.mapNotNull { it.getValue(Character::class.java) }
     }
 }

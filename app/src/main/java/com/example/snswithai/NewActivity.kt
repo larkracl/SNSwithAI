@@ -76,7 +76,7 @@ class NewActivity : AppCompatActivity() {
     private suspend fun generateContent(prompt: String) {
         val modelId = "gemini-2.0-flash-preview-image-generation"
         val generateContentApi = "streamGenerateContent"
-        val url = "https://generativelanguage.googleapis.com/v1beta/models/${modelId}:${generateContentApi}?key=${GEMINI_API_KEY}"
+        val url = "https://generativelanguage.googleapis.com/v1beta/models/${modelId}:${generateContentApi}?key=${IMG_API_KEY}"
 
         val jsonBody = gson.toJson(mapOf(
             "contents" to listOf(mapOf(

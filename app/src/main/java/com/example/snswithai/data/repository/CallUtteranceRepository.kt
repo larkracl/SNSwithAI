@@ -1,30 +1,30 @@
 package com.example.snswithai.data.repository
 
 import com.example.snswithai.data.local.db.entity.CallUtterance
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
 
-class CallUtteranceRepository(private val db: FirebaseFirestore) {
+class CallUtteranceRepository(private val db: FirebaseDatabase) {
 
-    private val callUtterancesCollection = db.collection("callUtterances")
+    private val callUtterancesRef = db.getReference("callUtterances")
 
     suspend fun createCallUtterance(utterance: CallUtterance) {
-        callUtterancesCollection.document(utterance.utteranceId).set(utterance).await()
+        callUtterancesRef.child(utterance.utteranceId).setValue(utterance).await()
     }
 
     suspend fun getCallUtterance(utteranceId: String): CallUtterance? {
-        return callUtterancesCollection.document(utteranceId).get().await().toObject(CallUtterance::class.java)
+        return callUtterancesRef.child(utteranceId).get().await().getValue(CallUtterance::class.java)
     }
 
     suspend fun updateCallUtterance(utterance: CallUtterance) {
-        callUtterancesCollection.document(utterance.utteranceId).set(utterance).await()
+        callUtterancesRef.child(utterance.utteranceId).setValue(utterance).await()
     }
 
     suspend fun deleteCallUtterance(utteranceId: String) {
-        callUtterancesCollection.document(utteranceId).delete().await()
+        callUtterancesRef.child(utteranceId).removeValue().await()
     }
 
     suspend fun getUtterancesForCall(callId: String): List<CallUtterance> {
-        return callUtterancesCollection.whereEqualTo("callId", callId).orderBy("timestamp").get().await().toObjects(CallUtterance::class.java)
+        return callUtterancesRef.orderByChild("callId").equalTo(callId).get().await().children.mapNotNull { it.getValue(CallUtterance::class.java) }
     }
 }

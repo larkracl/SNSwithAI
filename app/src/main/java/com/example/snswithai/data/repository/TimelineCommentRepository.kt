@@ -1,39 +1,39 @@
 package com.example.snswithai.data.repository
 
 import com.example.snswithai.data.local.db.entity.TimelineComment
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FieldValue
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ServerValue
 import kotlinx.coroutines.tasks.await
 
-class TimelineCommentRepository(private val db: FirebaseFirestore) {
+class TimelineCommentRepository(private val db: FirebaseDatabase) {
 
-    private val timelineCommentsCollection = db.collection("timelineComments")
+    private val timelineCommentsRef = db.getReference("timelineComments")
 
     suspend fun createTimelineComment(comment: TimelineComment) {
-        timelineCommentsCollection.document(comment.commentId).set(comment).await()
+        timelineCommentsRef.child(comment.commentId).setValue(comment).await()
     }
 
     suspend fun getTimelineComment(commentId: String): TimelineComment? {
-        return timelineCommentsCollection.document(commentId).get().await().toObject(TimelineComment::class.java)
+        return timelineCommentsRef.child(commentId).get().await().getValue(TimelineComment::class.java)
     }
 
     suspend fun updateTimelineComment(comment: TimelineComment) {
-        timelineCommentsCollection.document(comment.commentId).set(comment).await()
+        timelineCommentsRef.child(comment.commentId).setValue(comment).await()
     }
 
     suspend fun deleteTimelineComment(commentId: String) {
-        timelineCommentsCollection.document(commentId).delete().await()
+        timelineCommentsRef.child(commentId).removeValue().await()
     }
 
     suspend fun getCommentsForPost(postId: String): List<TimelineComment> {
-        return timelineCommentsCollection.whereEqualTo("postId", postId).orderBy("createdAt").get().await().toObjects(TimelineComment::class.java)
+        return timelineCommentsRef.orderByChild("postId").equalTo(postId).get().await().children.mapNotNull { it.getValue(TimelineComment::class.java) }
     }
 
     suspend fun incrementLikeCount(commentId: String) {
-        timelineCommentsCollection.document(commentId).update("likeCount", FieldValue.increment(1)).await()
+        timelineCommentsRef.child(commentId).child("likeCount").setValue(ServerValue.increment(1)).await()
     }
 
     suspend fun decrementLikeCount(commentId: String) {
-        timelineCommentsCollection.document(commentId).update("likeCount", FieldValue.increment(-1)).await()
+        timelineCommentsRef.child(commentId).child("likeCount").setValue(ServerValue.increment(-1)).await()
     }
 }

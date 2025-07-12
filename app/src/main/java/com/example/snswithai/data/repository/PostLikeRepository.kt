@@ -1,37 +1,27 @@
 package com.example.snswithai.data.repository
 
 import com.example.snswithai.data.local.db.entity.PostLike
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
 
-class PostLikeRepository(private val db: FirebaseFirestore) {
+class PostLikeRepository(private val db: FirebaseDatabase) {
 
-    private val postLikesCollection = db.collection("postLikes")
+    private val postLikesRef = db.getReference("postLikes")
 
-    suspend fun createPostLike(postLike: PostLike) {
-        postLikesCollection.document(postLike.likeId).set(postLike).await()
+    suspend fun addLikeToPost(like: PostLike) {
+        postLikesRef.child(like.likeId).setValue(like).await()
     }
 
-    suspend fun getPostLike(likeId: String): PostLike? {
-        return postLikesCollection.document(likeId).get().await().toObject(PostLike::class.java)
+    suspend fun removeLikeFromPost(likeId: String) {
+        postLikesRef.child(likeId).removeValue().await()
     }
 
-    suspend fun deletePostLike(likeId: String) {
-        postLikesCollection.document(likeId).delete().await()
+    suspend fun getLikesForPost(postId: String): List<PostLike> {
+        return postLikesRef.orderByChild("postId").equalTo(postId).get().await().children.mapNotNull { it.getValue(PostLike::class.java) }
     }
 
-    suspend fun getPostLikesForPost(postId: String): List<PostLike> {
-        return postLikesCollection.whereEqualTo("postId", postId).get().await().toObjects(PostLike::class.java)
-    }
-
-    suspend fun getPostLikeByUserAndPost(userId: String, postId: String): PostLike? {
-        return postLikesCollection
-            .whereEqualTo("likedByUserId", userId)
-            .whereEqualTo("postId", postId)
-            .get()
-            .await()
-            .documents
-            .firstOrNull()
-            ?.toObject(PostLike::class.java)
+    suspend fun hasUserLikedPost(userId: String, postId: String): Boolean {
+        val snapshot = postLikesRef.orderByChild("userId_postId").equalTo("${userId}_${postId}").get().await()
+        return snapshot.exists()
     }
 }

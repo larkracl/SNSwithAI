@@ -1,30 +1,18 @@
 package com.example.snswithai.data.repository
 
 import com.example.snswithai.data.local.db.entity.ChatMessage
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
 
-class ChatMessageRepository(private val db: FirebaseFirestore) {
+class ChatMessageRepository(private val db: FirebaseDatabase) {
 
-    private val chatMessagesCollection = db.collection("chatMessages")
+    private val chatMessagesRef = db.getReference("chatMessages")
 
-    suspend fun createChatMessage(chatMessage: ChatMessage) {
-        chatMessagesCollection.document(chatMessage.messageId).set(chatMessage).await()
+    suspend fun createChatMessage(message: ChatMessage) {
+        chatMessagesRef.child(message.messageId).setValue(message).await()
     }
 
-    suspend fun getChatMessage(messageId: String): ChatMessage? {
-        return chatMessagesCollection.document(messageId).get().await().toObject(ChatMessage::class.java)
-    }
-
-    suspend fun updateChatMessage(chatMessage: ChatMessage) {
-        chatMessagesCollection.document(chatMessage.messageId).set(chatMessage).await()
-    }
-
-    suspend fun deleteChatMessage(messageId: String) {
-        chatMessagesCollection.document(messageId).delete().await()
-    }
-
-    suspend fun getChatMessagesForChatRoom(chatRoomId: String): List<ChatMessage> {
-        return chatMessagesCollection.whereEqualTo("chatRoomId", chatRoomId).orderBy("timestamp").get().await().toObjects(ChatMessage::class.java)
+    suspend fun getMessagesForChatRoom(chatRoomId: String): List<ChatMessage> {
+        return chatMessagesRef.orderByChild("chatRoomId").equalTo(chatRoomId).get().await().children.mapNotNull { it.getValue(ChatMessage::class.java) }
     }
 }

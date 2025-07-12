@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,17 +24,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun logAllUsers() {
-        val db = FirebaseFirestore.getInstance()
-        db.collection("users")
+        val db = FirebaseDatabase.getInstance()
+        db.getReference("users")
             .get()
             .addOnSuccessListener { result ->
-                if (result.isEmpty) {
-                    Log.d("MainActivity", "No users found in Firestore.")
+                if (!result.exists()) {
+                    Log.d("MainActivity", "No users found in Realtime Database.")
                     return@addOnSuccessListener
                 }
-                Log.d("MainActivity", "--- Firestore Users ---")
-                for (document in result) {
-                    Log.d("MainActivity", "User ID: ${document.id}, Data: ${document.data}")
+                Log.d("MainActivity", "--- Realtime Database Users ---")
+                for (child in result.children) {
+                    Log.d("MainActivity", "User ID: ${child.key}, Data: ${child.value}")
                 }
                 Log.d("MainActivity", "-----------------------")
             }
