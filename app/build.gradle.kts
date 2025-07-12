@@ -1,3 +1,11 @@
+import java.util.Properties
+
+// ① app 모듈 내부(.app 디렉터리)에 있는 .env 파일 로드
+val envFile = projectDir.resolve(".env")
+val envProps = Properties().apply {
+    if (envFile.exists()) load(envFile.inputStream())
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -16,6 +24,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val elevenKey: String = envProps.getProperty("ELEVEN_LABS_API_KEY", "")
+        buildConfigField("String", "ELEVEN_LABS_API_KEY", "\"$elevenKey\"")
     }
 
     buildTypes {
@@ -35,6 +46,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         dataBinding = true
     }
 }
