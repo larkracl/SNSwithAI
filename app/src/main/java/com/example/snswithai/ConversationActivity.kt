@@ -1,23 +1,19 @@
 package com.example.snswithai
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.example.snswithai.databinding.ActivityConversationBinding
+import com.example.snswithai.tts.TtsMessageListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import android.util.Log // Log import 추가
-import org.json.JSONObject // JSONObject import 추가
-
-// TtsManager import 추가
-import com.example.snswithai.JsonDataManager
-import com.example.snswithai.tts.TtsMessageListener
+import org.json.JSONObject
 
 class ConversationActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityConversationBinding
     private val conversationManager = ConversationManager()
-
     private lateinit var ttsListener: TtsMessageListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,43 +21,88 @@ class ConversationActivity : AppCompatActivity() {
         binding = ActivityConversationBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // TTS 리스너 설정
         ttsListener = TtsMessageListener(this, "eleven-key")
         JsonDataManager.registerListener(ttsListener)
 
-        startConversation()
+        // 대화 시작 (초기화)
+        initializeConversation()
+
+        // 전송 버튼 클릭 리스너 설정
+        binding.sendButton.setOnClickListener {
+            val userInput = binding.messageInput.text.toString()
+            if (userInput.isNotBlank()) {
+                // 사용자의 메시지를 화면에 표시
+                binding.conversationLog.append("나: $userInput\n")
+                // 사용자의 메시지를 JSON으로 기록하고 처리
+                handleJsonMessage(userInput, 0) // 0은 사용자를 의미
+                sendMessageToAI(userInput)
+                binding.messageInput.text.clear()
+            }
+        }
     }
+
     override fun onDestroy() {
         super.onDestroy()
-        // ★ TTS 리스너 해제 & 자원 정리
         JsonDataManager.unregisterListener(ttsListener)
         ttsListener.destroy()
     }
-    private fun startConversation() {
+
+    private fun initializeConversation() {
         CoroutineScope(Dispatchers.Main).launch {
             conversationManager.startConversation(
-                "대화 시작", // initialPrompt
-                { message -> // onMessage 콜백: 이제 화면에 직접 출력하지 않고, 필요시 Logcat에만 출력
-                    Log.d("ConversationActivity", "Raw message received: $message") // 디버깅 용도로 유지
+                "대화 시작",
+                { message ->
+                    // AI의 응답을 화면에 표시
+                    binding.conversationLog.append("$message\n")
                 },
-                { jsonMessage -> // onJsonMessage 콜백: JSON 메시지를 파싱하여 출력
+                { jsonMessage ->
+                    // 이 콜백은 이제 sendMessage에서만 사용됩니다.
+                    // 필요시 초기화 단계에서도 JSON 처리가 가능합니다.
+                }
+            )
+        }
+    }
+
+    private fun sendMessageToAI(prompt: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            conversationManager.sendMessage(
+                prompt,
+                { message -> // onMessage: AI의 응답을 받아 화면에 표시
+                    binding.conversationLog.append("$message\n")
+                    Log.d("ConversationActivity", "AI Response: $message")
+                },
+                { jsonMessage -> // onJsonMessage: 사용자 및 AI 메시지를 JSON으로 처리
                     try {
                         val jsonObject = JSONObject(jsonMessage)
-                        val aiNumber = jsonObject.getInt("AI의 번호") // AI의 번호 가져오기
-                        val prompt = jsonObject.getString("대화 프롬프트") // 대화 프롬프트 가져오기
+                        val aiNumber = jsonObject.getInt("AI의 번호")
+                        val message = jsonObject.getString("대화 프롬프트")
 
-                        val formattedMessage = "AI $aiNumber (JSON): $prompt"
-                        binding.conversationLog.append(formattedMessage + "\n") // JSON 파싱 결과만 화면에 출력, 줄바꿈 추가
-                        Log.d("JSON_Output_Parsed", formattedMessage) // 파싱된 메시지 Logcat 출력
+                        val formattedMessage = if (aiNumber == 0) {
+                            "나 (JSON): $message"
+                        } else {
+                            "AI $aiNumber (JSON): $message"
+                        }
+                        Log.d("JSON_Output_Parsed", formattedMessage)
 
-                        // JSON을 JsonDataManager에 게시하면 TtsMessageListener가 받아서 음성 재생합니다
-                        JsonDataManager.postJsonMessage(jsonMessage)
+                        // AI의 메시지만 TTS로 재생
+                        if (aiNumber != 0) {
+                            JsonDataManager.postJsonMessage(jsonMessage)
+                        }
 
                     } catch (e: Exception) {
                         Log.e("JSON_Parse_Error", "JSON 파싱 오류: $jsonMessage", e)
-                        binding.conversationLog.append("JSON 파싱 오류: ${e.message}\n") // 줄바꿈 추가
+                        binding.conversationLog.append("JSON 파싱 오류: ${e.message}\n")
                     }
                 }
             )
         }
+    }
+
+    // 사용자의 메시지를 JSON으로 변환하고 게시하는 함수
+    private fun handleJsonMessage(message: String, senderId: Int) {
+        val jsonMessage = "{ \"AI의 번호\": $senderId, \"대화 프롬프트\": \"${message.replace("\"", "\\\"")}\" }"
+        Log.d("JSON_Output_User", "User message logged: $jsonMessage")
+        // 사용자의 메시지는 TTS로 재생하지 않으므로 JsonDataManager에 게시하지 않습니다.
     }
 }
