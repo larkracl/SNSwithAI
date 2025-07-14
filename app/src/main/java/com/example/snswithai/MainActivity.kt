@@ -18,10 +18,17 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        // 대화 테스트 버튼
+        // "대화 시작" 버튼이 캐릭터 선택 화면으로 이동하도록 변경
         val conversationTestButton = findViewById<Button>(R.id.conversation_test_button)
         conversationTestButton.setOnClickListener {
-            val intent = Intent(this, ConversationActivity::class.java)
+            val intent = Intent(this, CharacterSelectionActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 타임라인 테스트 버튼
+        val timelineTestButton = findViewById<Button>(R.id.timeline_test_button)
+        timelineTestButton.setOnClickListener {
+            val intent = Intent(this, TimelineActivity::class.java)
             startActivity(intent)
         }
 

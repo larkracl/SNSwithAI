@@ -18,6 +18,16 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/timeline_test_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="타임라인 테스트"
+        app:layout_constraintBottom_toTopOf="@id/conversation_test_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
         android:id="@+id/conversation_test_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

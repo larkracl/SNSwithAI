@@ -23,7 +23,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".ConversationActivity" />
+        <activity android:name=".TimelineActivity" />
         <activity android:name=".VoiceTestActivity" />
+        <activity android:name=".CharacterSelectionActivity" />
     </application>
 
 </manifest>
