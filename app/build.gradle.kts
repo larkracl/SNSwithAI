@@ -68,7 +68,9 @@ dependencies {
     implementation("com.google.firebase:firebase-database-ktx")
     implementation(libs.firebase.ai) // Add this line
     implementation("com.squareup.okhttp3:okhttp:5.1.0")
-    implementation("com.google.code.gson:gson:2.10.1") // For JSON parsing
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation(libs.androidx.room.common.jvm)
+    implementation(libs.androidx.room.runtime.android) // For JSON parsing
 
     // testImplementation(libs.junit)
     // androidTestImplementation(libs.androidx.junit)
