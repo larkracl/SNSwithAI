@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SNSwithAI</string>
+    <string name="character_name_desc">캐릭터 이름</string>
+    <string name="conversation_log_desc">대화 내용 로그</string>
+    <string name="mic_button_desc">음성 입력 버튼</string>
+    <string name="character_description_desc">캐릭터 설명</string>
+    <string name="character_personality_desc">캐릭터 성격</string>
+    <string name="character_image_desc">캐릭터 프로필 이미지</string>
+</resources>
