@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/voice_test_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 음성 인식 시작 버튼 -->
+    <Button
+        android:id="@+id/btn_start_listen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="음성 인식 시작"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"/>
+
+    <!-- 실시간 RMS 레벨 미터 -->
+    <ProgressBar
+        android:id="@+id/pb_level"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="298dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="16dp"
+        android:max="100"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_start_listen" />
+
+    <!-- 인식된 텍스트 출력 -->
+    <TextView
+        android:id="@+id/tv_recognized"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:padding="16dp"
+        android:text="인식 결과가 여기에 표시됩니다."
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pb_level" />
+</androidx.constraintlayout.widget.ConstraintLayout>

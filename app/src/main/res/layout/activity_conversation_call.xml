@@ -1,0 +1,143 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app   ="http://schemas.android.com/apk/res-auto"
+    xmlns:tools ="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="imagePath"          type="String"/>
+        <variable name="charName"           type="String"/>
+        <variable name="charDescription"    type="String"/>
+        <variable name="charPersonality"    type="String"/>
+        <variable name="charAge"          type="String"/>
+        <variable name="charHobby"        type="String"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- 뒤로가기 버튼 -->
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/back_button_desc"
+            android:src="@drawable/ic_baseline_arrow_back_24"
+            android:elevation="8dp"
+            android:translationZ="8dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Chronometer: 통화 시간 표시 -->
+        <Chronometer
+            android:id="@+id/chronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="16dp"
+            android:format="통화 시간: %s"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <!-- 0) 프로필 이미지 (cover) -->
+
+        <ImageView
+            android:id="@+id/ivCharacterImage"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:contentDescription="@string/character_image_desc"
+            android:scaleType="centerCrop"
+            app:imagePath="@{imagePath}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnBack"/>
+
+        <!-- 캐릭터 이름 -->
+        <TextView
+            android:id="@+id/tvCharacterName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{charName}"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginStart="8dp"
+            app:layout_constraintTop_toTopOf="@id/ivCharacterImage"
+            app:layout_constraintStart_toEndOf="@id/ivCharacterImage"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <ScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvCharacterName"
+            app:layout_constraintVertical_bias="1.0">
+
+            <TextView
+                android:id="@+id/conversation_log"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityLiveRegion="polite"
+                android:contentDescription="@string/conversation_log_desc"
+                android:padding="16dp"
+                android:textIsSelectable="true"
+                android:textSize="16sp"
+                tools:text="(대화 내용이 여기에 표시됩니다)" />
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- 3-1) 마이크 버튼: 48dp로 확대 -->
+            <ImageButton
+                android:id="@+id/btn_mic"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_baseline_mic_24"
+                android:contentDescription="@string/mic_button_desc"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="centerCrop"/>
+
+            <!-- 3-2) 메시지 입력창: 높이 48dp -->
+            <EditText
+                android:id="@+id/message_input"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:hint="메시지를 입력하거나 마이크 클릭"
+                android:imeOptions="actionSend"/>
+
+            <!-- 3-3) 전송 버튼: 기본 Material 버튼은 이미 48dp 이상 -->
+            <Button
+                android:id="@+id/send_button"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="전송"/>
+
+            <Button
+                android:id="@+id/btn_end_call"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:text="통화 종료"/>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
