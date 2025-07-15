@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         // 음성 테스트 버튼
         val voiceTestButton = findViewById<Button>(R.id.voice_test_button)
         voiceTestButton.setOnClickListener {
-            startActivity(Intent(this, VoiceTestActivity::class.java))
+            startActivity(Intent(this, ConversationActivity_Call::class.java))
         }
 
     }

@@ -79,7 +79,6 @@ class STTManager(
         val matches = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
         matches?.firstOrNull()?.let {
             Log.d("STTManager", "중간 인식 결과: $it")
-            onResult(it)
         }
     }
 

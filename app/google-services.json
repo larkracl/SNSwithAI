@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "571403902471",
+    "firebase_url": "https://snswithai-29d1f-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "snswithai-29d1f",
     "storage_bucket": "snswithai-29d1f.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.snswithai"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "571403902471-3pt8j87r98d1asvv72185rn2c6tio5mk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.snswithai",
+            "certificate_hash": "26b8235bd1c16d5f4975470c7ac6a1ab1bf1fabd"
+          }
+        },
+        {
+          "client_id": "571403902471-rb4dq20k7jntoeglbk2kidmir7o11m89.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBqBzZRHuaNghKJr9bGEiU6Znxr_wMSxyY"
@@ -20,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "571403902471-rb4dq20k7jntoeglbk2kidmir7o11m89.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

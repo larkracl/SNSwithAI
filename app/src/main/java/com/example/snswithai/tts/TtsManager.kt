@@ -7,23 +7,17 @@ import java.io.File
 
 class TtsManager(
     private val context: Context,
-    private val apiKey: String
+    private val apiKey: String,
+    private val voiceId: String    // ☆ 추가
 ) {
-    private val voiceIdMap = mapOf(
-        1 to "29vD33N1CtxCmqQRPOHJ",
-        2 to "21m00Tcm4TlvDq8ikWAM",
-        3 to "5Q0t7uMcjvnagumLfvZi"
-    )
-    private val clients by lazy {
-        voiceIdMap.mapValues { ElevenLabsTtsClient(context, apiKey, it.value) }
-    }
-    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val client = ElevenLabsTtsClient(context, apiKey, voiceId)
+    private val scope  = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-    fun speak(aiNumber: Int, text: String) {
-        val client = clients[aiNumber] ?: clients[1]!!
+    /** 프롬프트만 넘기면, 생성시 설정된 voiceId 로 합성합니다 */
+    fun speak(text: String) {
         scope.launch {
             try {
-                val file: File = client.synthesize(text)
+                val file = client.synthesize(text)
                 MediaPlayer().apply {
                     setDataSource(file.absolutePath)
                     prepareAsync()

@@ -1,6 +1,15 @@
+import java.util.Properties
+
+// ① app 모듈 내부(.app 디렉터리)에 있는 env 파일 로드
+val envFile = projectDir.resolve("env")
+val envProps = Properties().apply {
+    if (envFile.exists()) load(envFile.inputStream())
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("org.jetbrains.kotlin.kapt")
     id("com.google.gms.google-services")
 }
 
@@ -16,6 +25,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val elevenKey: String = envProps.getProperty("ELEVEN_LABS_API_KEY", "")
+        buildConfigField("String", "ELEVEN_LABS_API_KEY", "\"$elevenKey\"")
     }
 
     buildTypes {
@@ -35,6 +47,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         dataBinding = true
     }
 }
@@ -56,4 +69,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     // JSON 직렬화/역직렬화용
     implementation("com.google.code.gson:gson:2.10.1")
+    // Realtime Database KTX
+    implementation("com.google.firebase:firebase-database-ktx")
+    implementation("io.coil-kt:coil:2.4.0")
 }

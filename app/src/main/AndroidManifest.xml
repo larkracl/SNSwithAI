@@ -26,6 +26,7 @@
         <activity android:name=".TimelineActivity" />
         <activity android:name=".VoiceTestActivity" />
         <activity android:name=".CharacterSelectionActivity" />
+        <activity android:name=".ConversationActivity_Call"/>
     </application>
 
 </manifest>
