@@ -1,8 +1,11 @@
 package com.example.snswithai
 
+import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
 import android.view.View
@@ -22,10 +25,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import android.content.ContentValues
-import android.os.Build
-import android.provider.MediaStore
-import java.io.IOException
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
@@ -99,7 +98,6 @@ class NewActivity_sm : AppCompatActivity() {
                 val responseBody = response.body?.string()
 
                 if (response.isSuccessful && !responseBody.isNullOrBlank()) {
-                    // [핵심 수정] 응답 문자열에서 Base64 데이터만 추출합니다.
                     val imageBase64 = extractBase64FromResponse(responseBody)
 
                     if (imageBase64 != null && isActive) {
@@ -118,14 +116,14 @@ class NewActivity_sm : AppCompatActivity() {
                 } else if (isActive) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(this@NewActivity_sm, "API 오류: ${response.code}", Toast.LENGTH_LONG).show()
-                        Log.e("NewActivity", "API 오류: ${response.code} - $responseBody")
+                        Log.e("NewActivity_sm", "API 오류: ${response.code} - $responseBody")
                     }
                 }
             } catch (e: Exception) {
                 if (isActive) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(this@NewActivity_sm, "요청 오류: ${e.message}", Toast.LENGTH_LONG).show()
-                        Log.e("NewActivity", "네트워크 또는 디코딩 예외 발생", e)
+                        Log.e("NewActivity_sm", "네트워크 또는 디코딩 예외 발생", e)
                     }
                 }
             } finally {
@@ -138,23 +136,18 @@ class NewActivity_sm : AppCompatActivity() {
         }
     }
 
-    /**
-     * [핵심 추가]
-     * 정규식을 사용하여 API의 전체 응답 문자열에서 순수한 Base64 데이터만 추출하는 함수
-     */
     private fun extractBase64FromResponse(response: String): String? {
-        // "data": "..." 패턴을 찾기 위한 정규식
         val pattern = Pattern.compile("\"data\":\\s*\"([A-Za-z0-9+/=]+)\"")
         val matcher = pattern.matcher(response)
 
         return if (matcher.find()) {
-            matcher.group(1) // 첫 번째 캡처 그룹(Base64 문자열)을 반환
+            matcher.group(1)
         } else {
-            null // 패턴을 찾지 못한 경우
+            null
         }
     }
-//이디다가 저장 하는지?
-            private fun saveImageToGallery(bitmap: Bitmap, displayName: String) {
+
+    private fun saveImageToGallery(bitmap: Bitmap, displayName: String) {
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, displayName)
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
@@ -166,27 +159,27 @@ class NewActivity_sm : AppCompatActivity() {
         val resolver = contentResolver
         val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
 
-        uri?.let {
+        if (uri != null) {
             try {
-                resolver.openOutputStream(it)?.use { outputStream ->
+                resolver.openOutputStream(uri)?.use { outputStream ->
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     values.clear()
                     values.put(MediaStore.Images.Media.IS_PENDING, 0)
-                    resolver.update(it, values, null, null)
+                    resolver.update(uri, values, null, null)
                 }
 
-                Log.d("NewActivity", "Image saved to gallery: $uri")
+                Log.d("NewActivity_sm", "Image saved to gallery: $uri")
                 Toast.makeText(this, "갤러리에 저장되었습니다.", Toast.LENGTH_SHORT).show()
 
             } catch (e: Exception) {
-                Log.e("NewActivity", "Error saving image to gallery", e)
+                Log.e("NewActivity_sm", "Error saving image to gallery", e)
                 Toast.makeText(this, "이미지 저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
             }
-        } ?: run {
-            Log.e("NewActivity", "Failed to create MediaStore entry.")
+        } else {
+            Log.e("NewActivity_sm", "Failed to create MediaStore entry.")
             Toast.makeText(this, "이미지 저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
         }
     }
