@@ -28,11 +28,13 @@ class TimelineActivity : AppCompatActivity(), JsonMessageListener {
         runOnUiThread {
             try {
                 val jsonObject = JSONObject(json)
-                val type = jsonObject.optString("type")
-                if (type == "timeline_message") {
-                    val message = jsonObject.optString("message", "메시지 없음")
+                val type = jsonObject.optString("대화 방식")
+                if (type == "timeline") {
+                    val aiNumber = jsonObject.optInt("AI의 번호")
+                    val message = jsonObject.optString("대화 프롬프트", "메시지 없음")
+                    val newLog = "AI $aiNumber: $message"
                     val currentText = binding.timelineLog.text.toString()
-                    binding.timelineLog.text = if (currentText.isEmpty()) message else "$currentText\n$message"
+                    binding.timelineLog.text = if (currentText.isEmpty()) newLog else "$currentText\n$newLog"
                 }
             } catch (e: Exception) {
                 // JSON 파싱 오류 처리
