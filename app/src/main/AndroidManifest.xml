@@ -26,11 +26,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".NewActivity_sm" />
+        <activity android:name=".MainActivity" />
         <activity android:name=".ConversationActivity" />
         <activity android:name=".TimelineActivity" />
         <activity android:name=".VoiceTestActivity" />
         <activity android:name=".CharacterSelectionActivity" />
         <activity android:name=".ConversationActivity_Call"/>
+        <activity android:name=".IntermediateActivity"/>
     </application>
 
 </manifest>
