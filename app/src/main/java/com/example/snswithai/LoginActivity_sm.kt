@@ -15,7 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity_sm : AppCompatActivity() {
 
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
@@ -46,7 +46,7 @@ class LoginActivity : AppCompatActivity() {
             // For demonstration purposes, a simple hardcoded check
             if (email == "test@example.com" && password == "password123") {
                 Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, MainActivity::class.java)
+                val intent = Intent(this, NewActivity_sm::class.java)
                 startActivity(intent)
                 finish() // Close LoginActivity so user can't go back to it
             } else {
@@ -88,7 +88,7 @@ class LoginActivity : AppCompatActivity() {
                     val user = auth.currentUser
                     user?.let { saveUserToDatabase(it) }
                     Toast.makeText(this, "Authentication successful.", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, MainActivity::class.java)
+                    val intent = Intent(this, NewActivity_sm::class.java)
                     startActivity(intent)
                     finish()
                 } else {

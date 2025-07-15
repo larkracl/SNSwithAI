@@ -29,7 +29,7 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
-class NewActivity : AppCompatActivity() {
+class NewActivity_sm : AppCompatActivity() {
 
     private lateinit var imageView: ImageView
     private lateinit var promptEditText: EditText
@@ -107,24 +107,24 @@ class NewActivity : AppCompatActivity() {
                         val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                         withContext(Dispatchers.Main) {
                             imageView.setImageBitmap(bitmap)
-                            Toast.makeText(this@NewActivity, "이미지 생성 완료!", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@NewActivity_sm, "이미지 생성 완료!", Toast.LENGTH_LONG).show()
                             saveImageToGallery(bitmap, "generated_image_${System.currentTimeMillis()}.jpg")
                         }
                     } else if (isActive) {
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(this@NewActivity, "응답에서 이미지 데이터를 추출하지 못했습니다.", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@NewActivity_sm, "응답에서 이미지 데이터를 추출하지 못했습니다.", Toast.LENGTH_LONG).show()
                         }
                     }
                 } else if (isActive) {
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(this@NewActivity, "API 오류: ${response.code}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@NewActivity_sm, "API 오류: ${response.code}", Toast.LENGTH_LONG).show()
                         Log.e("NewActivity", "API 오류: ${response.code} - $responseBody")
                     }
                 }
             } catch (e: Exception) {
                 if (isActive) {
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(this@NewActivity, "요청 오류: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@NewActivity_sm, "요청 오류: ${e.message}", Toast.LENGTH_LONG).show()
                         Log.e("NewActivity", "네트워크 또는 디코딩 예외 발생", e)
                     }
                 }

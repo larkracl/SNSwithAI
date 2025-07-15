@@ -89,4 +89,4 @@ class UserRepository(private val db: FirebaseDatabase) {
 
 ## 5. 전체적인 마이그레이션 요약
 
-프로젝트의 모든 Repository (`UserRepository`, `TimelinePostRepository` 등)와 Activity (`LoginActivity`, `MainActivity`)에서 Firestore API를 Realtime Database API로 교체했습니다. 이제 프로젝트는 Firestore가 아닌 Realtime Database와 통신합니다.
+프로젝트의 모든 Repository (`UserRepository`, `TimelinePostRepository` 등)와 Activity (`LoginActivity`)에서 Firestore API를 Realtime Database API로 교체했습니다. 이제 프로젝트는 Firestore가 아닌 Realtime Database와 통신합니다.
