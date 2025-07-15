@@ -92,11 +92,10 @@ class ConversationActivity_Call : AppCompatActivity() {
             systemInstruction = content { text(systemPrompt) }
         )
     }
-
     private fun initTts() {
         ttsManager = TtsManager(
             context = this,
-            apiKey   = BuildConfig.ELEVEN_LABS_API_KEY,
+            apiKey   = BuildConfig.ELEVEN_LABS_API_KEY as String,
             voiceId  = currentChar.voiceID
         )
     }

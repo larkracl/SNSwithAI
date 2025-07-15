@@ -16,12 +16,12 @@ plugins {
 
 android {
     namespace = "com.example.snswithai"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.snswithai"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -36,7 +36,7 @@ android {
         val imgApiKey = localProperties.getProperty("IMG_API_KEY", "")
         buildConfigField("String", "IMG_API_KEY", "\"$imgApiKey\"")
         val elevenKey = localProperties.getProperty("ELEVEN_LABS_API_KEY", "")
-        buildConfigField("string", "elevenKey", "\"$elevenKey\"")
+        buildConfigField("String", "ELEVEN_LABS_API_KEY", "\"$elevenKey\"")
     }
     buildFeatures{
         buildConfig = true
