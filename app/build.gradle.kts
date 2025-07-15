@@ -1,3 +1,4 @@
+import java.io.FileInputStream
 import java.util.Properties
 
 // ① app 모듈 내부(.app 디렉터리)에 있는 env 파일 로드
@@ -34,11 +35,11 @@ android {
         }
         val imgApiKey = localProperties.getProperty("IMG_API_KEY", "")
         buildConfigField("String", "IMG_API_KEY", "\"$imgApiKey\"")
+        val elevenKey = localProperties.getProperty("ELEVEN_LABS_API_KEY", "")
+        buildConfigField("string", "elevenKey", "\"$elevenKey\"")
     }
     buildFeatures{
         buildConfig = true
-        val elevenKey: String = envProps.getProperty("ELEVEN_LABS_API_KEY", "")
-        buildConfigField("String", "ELEVEN_LABS_API_KEY", "\"$elevenKey\"")
     }
 
     buildTypes {

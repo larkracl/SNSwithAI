@@ -5,8 +5,6 @@
     <!-- You might have other strings here -->
     <string name="image_generation_hint">Enter a prompt to generate an image</string>
     <string name="generate_image_button_text">Generate Image</string>
-</resources>
-    
     <string name="character_name_desc">캐릭터 이름</string>
     <string name="conversation_log_desc">대화 내용 로그</string>
     <string name="mic_button_desc">음성 입력 버튼</string>
