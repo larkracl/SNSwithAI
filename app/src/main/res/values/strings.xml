@@ -6,4 +6,5 @@
     <string name="character_description_desc">캐릭터 설명</string>
     <string name="character_personality_desc">캐릭터 성격</string>
     <string name="character_image_desc">캐릭터 프로필 이미지</string>
+    <string name="back_button_desc">뒤로가기</string>
 </resources>
