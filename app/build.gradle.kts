@@ -15,17 +15,28 @@ plugins {
 
 android {
     namespace = "com.example.snswithai"
-    compileSdk = 36
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.snswithai"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        // Read API key from local.properties
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(FileInputStream(localPropertiesFile))
+        }
+        val imgApiKey = localProperties.getProperty("IMG_API_KEY", "")
+        buildConfigField("String", "IMG_API_KEY", "\"$imgApiKey\"")
+    }
+    buildFeatures{
+        buildConfig = true
         val elevenKey: String = envProps.getProperty("ELEVEN_LABS_API_KEY", "")
         buildConfigField("String", "ELEVEN_LABS_API_KEY", "\"$elevenKey\"")
     }
@@ -53,23 +64,35 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-database-ktx")
+    implementation(libs.firebase.auth.ktx)
+    implementation("com.google.firebase:firebase-ai")
+
+    // HTTP & JSON
+    implementation("com.squareup.okhttp3:okhttp:5.1.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    // Room
+    implementation(libs.androidx.room.common.jvm)
+    implementation(libs.androidx.room.runtime.android)
+
+    // Coil
+    implementation("io.coil-kt:coil:2.4.0")
+
+    // Google Play Services Auth
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+
+    // Test dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation(platform("com.google.firebase:firebase-bom:33.16.0"))
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-ai")
-    // HTTP 요청용
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    // JSON 직렬화/역직렬화용
-    implementation("com.google.code.gson:gson:2.10.1")
-    // Realtime Database KTX
-    implementation("com.google.firebase:firebase-database-ktx")
-    implementation("io.coil-kt:coil:2.4.0")
 }
