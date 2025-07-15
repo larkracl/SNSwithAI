@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".NewActivity">
+
+    <!-- 이미지 뷰: 상단에 위치하며, 하단의 입력창 상단에 맞춰 크기가 조절됨 -->
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
+        android:background="#E0E0E0"
+        android:contentDescription="@string/generated_image_description"
+        android:scaleType="centerInside"
+        app:layout_constraintBottom_toTopOf="@+id/promptEditText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 텍스트 입력창: 생성 버튼의 위에 위치 -->
+    <EditText
+        android:id="@+id/promptEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:gravity="top"
+        android:hint="@string/image_generation_hint"
+        android:inputType="textMultiLine"
+        android:minLines="3"
+        app:layout_constraintBottom_toTopOf="@+id/generateImageButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 이미지 생성 버튼: 화면 하단에 위치 -->
+    <Button
+        android:id="@+id/generateImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/generate_image_button_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 프로그레스 바 (로딩 인디케이터): 화면 정중앙에 위치 -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" /> <!-- tools:visibility는 디자인 편집기에서만 보이게 함 -->
+
+</androidx.constraintlayout.widget.ConstraintLayout>
