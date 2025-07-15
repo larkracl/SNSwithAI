@@ -85,6 +85,8 @@ class ConversationActivity_Call : AppCompatActivity() {
             append("당신은 ${currentChar.name} (나이 ${currentChar.age}, 취미 ${currentChar.hobby}) 입니다. ")
             append("${currentChar.description}. ")
             append("성격 특성: ${currentChar.personality}.")
+            append("응답에는 이모티콘이나 별표(*) 같은 특수문자, 마크다운 문법을 포함하지 말고, ")
+            append("자연스럽고 간결한 한국어 문장만 사용하세요.")
         }
         aiService = AIService(
             systemInstruction = content { text(systemPrompt) }
