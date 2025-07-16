@@ -9,7 +9,7 @@ class TimelinePostRepository(private val db: FirebaseDatabase) {
 
     private val timelinePostsRef = db.getReference("timelinePosts")
 
-    suspend fun createTimelinePost(post: TimelinePost) {
+    suspend fun createTimelinePost(post: com.example.snswithai.data.model.TimelinePost) {
         timelinePostsRef.child(post.postId).setValue(post).await()
     }
 
@@ -17,7 +17,7 @@ class TimelinePostRepository(private val db: FirebaseDatabase) {
         return timelinePostsRef.child(postId).get().await().getValue(TimelinePost::class.java)
     }
 
-    suspend fun updateTimelinePost(post: TimelinePost) {
+    suspend fun updateTimelinePost(post: com.example.snswithai.data.model.TimelinePost) {
         timelinePostsRef.child(post.postId).setValue(post).await()
     }
 

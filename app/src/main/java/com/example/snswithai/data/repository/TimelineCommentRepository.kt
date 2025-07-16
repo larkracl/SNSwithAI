@@ -9,7 +9,7 @@ class TimelineCommentRepository(private val db: FirebaseDatabase) {
 
     private val timelineCommentsRef = db.getReference("timelineComments")
 
-    suspend fun createTimelineComment(comment: TimelineComment) {
+    suspend fun createTimelineComment(comment: com.example.snswithai.data.model.TimelineComment) {
         timelineCommentsRef.child(comment.commentId).setValue(comment).await()
     }
 
@@ -17,7 +17,7 @@ class TimelineCommentRepository(private val db: FirebaseDatabase) {
         return timelineCommentsRef.child(commentId).get().await().getValue(TimelineComment::class.java)
     }
 
-    suspend fun updateTimelineComment(comment: TimelineComment) {
+    suspend fun updateTimelineComment(comment: com.example.snswithai.data.model.TimelineComment) {
         timelineCommentsRef.child(comment.commentId).setValue(comment).await()
     }
 
