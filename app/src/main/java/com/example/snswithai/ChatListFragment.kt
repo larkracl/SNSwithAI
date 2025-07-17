@@ -24,7 +24,7 @@ class ChatListFragment : Fragment(R.layout.fragment_chatlist) {
         rvChatRooms.layoutManager = LinearLayoutManager(requireContext())
 
         // TODO: 실제 로그인된 userId 로 바꾸세요
-        val currentUserId = "user_alice_123"
+        val currentUserId = "ZCtJmhJKr7RklOwkOjJa2OvunbA3"
 
         FirebaseDatabase.getInstance()
             .reference

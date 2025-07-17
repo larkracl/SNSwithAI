@@ -13,13 +13,19 @@ class StartMainActivity : AppCompatActivity() {
         // "채팅" 탭 클릭 리스너만 남겨둠
         findViewById<LinearLayout>(R.id.chat).setOnClickListener {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, DbTestFragment())
+                .replace(R.id.fragment_container, ChatListFragment())
                 .commit()
         }
         // 2번째 버튼(navAI): ChatListFragment 예시
         findViewById<LinearLayout>(R.id.navAI).setOnClickListener {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ChatListFragment())
+                .replace(R.id.fragment_container, DbTestFragment())
+                .commit()
+        }
+        // 3번째 버튼 (Home)
+        findViewById<LinearLayout>(R.id.home).setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, HomeFragment())
                 .commit()
         }
     }
