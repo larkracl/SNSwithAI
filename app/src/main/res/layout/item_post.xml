@@ -31,7 +31,8 @@
                 android:layout_marginEnd="12dp" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
@@ -53,6 +54,13 @@
                     android:textColor="#77AA77"
                     android:textSize="12sp" />
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/btn_more"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_more_vert" />
+
         </LinearLayout>
 
         <!-- 게시글 내용 -->
@@ -104,7 +112,7 @@
                 android:id="@+id/icon_comment"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/ic_comment"
+                src="@drawable/ic_comment"
                 android:layout_marginEnd="4dp" />
 
             <TextView

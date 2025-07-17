@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class TimelinePost(
     val postId: String = "",
-    val userId: String = "",
+    @SerializedName("author_id")
     val authorId: String = "",
     val authorType: String = "",
     val content: String = "",
