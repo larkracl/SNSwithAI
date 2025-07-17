@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SNSwithAI">
         <activity
-            android:name=".StartMainActivity"
+            android:name=".LoginActivity_sm"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,6 +32,9 @@
         <activity android:name=".CharacterSelectionActivity" />
         <activity android:name=".ConversationActivity_Call"/>
         <activity android:name=".IntermediateActivity"/>
+        <activity android:name=".StartMainActivity">
+        </activity>
+
     </application>
 
 </manifest>

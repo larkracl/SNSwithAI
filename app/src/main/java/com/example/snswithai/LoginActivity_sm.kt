@@ -46,7 +46,7 @@ class LoginActivity_sm : AppCompatActivity() {
             // For demonstration purposes, a simple hardcoded check
             if (email == "test@example.com" && password == "password123") {
                 Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, IntermediateActivity::class.java)
+                val intent = Intent(this, StartMainActivity::class.java)
                 startActivity(intent)
                 finish() // Close LoginActivity so user can't go back to it
             } else {
@@ -88,7 +88,7 @@ class LoginActivity_sm : AppCompatActivity() {
                     val user = auth.currentUser
                     user?.let { checkUserExistsAndSave(it) }
                     Toast.makeText(this, "Authentication successful.", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, IntermediateActivity::class.java)
+                    val intent = Intent(this, StartMainActivity::class.java)
                     startActivity(intent)
                     finish()
                 } else {
