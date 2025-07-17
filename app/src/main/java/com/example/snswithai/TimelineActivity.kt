@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import com.example.snswithai.data.model.TimelinePost
-import com.example.snswithai.data.repository.TimelineCommentRepository
 import com.example.snswithai.data.repository.TimelinePostRepository
 import com.example.snswithai.databinding.ActivityTimelineBinding
 import com.google.firebase.auth.FirebaseAuth

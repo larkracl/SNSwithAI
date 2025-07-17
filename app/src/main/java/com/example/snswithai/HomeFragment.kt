@@ -1,5 +1,6 @@
 package com.example.snswithai
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -65,17 +66,21 @@ class HomeFragment : Fragment() {
 
         postAdapter = PostAdapter(
             postList,
-            // 게시글 클릭 시 삭제 예시
-            onDelete = { post ->       // post: 사용자가 클릭한 게시글 객체
+            onDelete = { post ->
                 lifecycleScope.launch {
                     postRepository.deleteTimelinePost(post.postId)
                 }
             },
-            // 게시글 클릭 시 수정 예시
             onEdit = { post ->
-                showEditDialog(post)        // 수정 화면 불러오기
+                showEditDialog(post)
             },
-            onLikeClick = { post -> updatePostLike(post) }
+            onLikeClick = { post -> updatePostLike(post) },
+            onPostClick = { post ->
+                val intent = Intent(requireContext(), PostDetailActivity::class.java).apply {
+                    putExtra("POST_ID", post.postId)
+                }
+                startActivity(intent)
+            }
         )
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -178,3 +183,4 @@ class HomeFragment : Fragment() {
         }
     }
 }
+

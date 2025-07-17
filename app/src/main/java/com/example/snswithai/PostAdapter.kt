@@ -15,7 +15,8 @@ class PostAdapter(
     private val postList: List<TimelinePost>,
     private val onEdit: (TimelinePost) -> Unit,
     private val onDelete: (TimelinePost) -> Unit,
-    private val onLikeClick: (TimelinePost) -> Unit
+    private val onLikeClick: (TimelinePost) -> Unit,
+    private val onPostClick: (TimelinePost) -> Unit
 ) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -37,6 +38,15 @@ class PostAdapter(
         private val commentCountTextView: TextView = itemView.findViewById(R.id.tv_comment_count)
         private val moreButton: ImageView = itemView.findViewById(R.id.btn_more)
         private val heartIcon: ImageView = itemView.findViewById(R.id.icon_heart)
+
+        init {
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    onPostClick(postList[position])
+                }
+            }
+        }
 
         fun bind(post: TimelinePost) {
             usernameTextView.text = post.author_name

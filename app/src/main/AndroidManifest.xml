@@ -35,6 +35,7 @@
         <activity android:name=".IntermediateActivity"/>
         <activity android:name=".StartMainActivity">
         </activity>
+        <activity android:name=".PostDetailActivity" />
 
     </application>
 
