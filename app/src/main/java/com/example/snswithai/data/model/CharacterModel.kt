@@ -6,7 +6,8 @@ import com.google.gson.annotations.SerializedName
 data class CharacterModel(
     val charNo: Int = 0,
     val name: String = "",
-    val age: String = "",
+    @SerializedName("age_group")
+    val ageGroup: String = "",
     val description: String = "",
     val personality: String = "",
     val hobby: String = "",

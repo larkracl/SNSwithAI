@@ -1,28 +1,23 @@
 package com.example.snswithai.data.repository
 
-import com.example.snswithai.data.model.TimelinePost
+import com.example.snswithai.data.local.db.entity.TimelinePost
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
 import kotlinx.coroutines.tasks.await
 
 class TimelinePostRepository(private val db: FirebaseDatabase) {
 
-    private val timelinePostsRef = db.getReference("timeline_posts")
+    private val timelinePostsRef = db.getReference("timelinePosts")
 
-    suspend fun createTimelinePost(post: TimelinePost) {
-        val postRef = if (post.postId.isEmpty()) {
-            timelinePostsRef.push()
-        } else {
-            timelinePostsRef.child(post.postId)
-        }
-        postRef.setValue(post.copy(postId = postRef.key ?: post.postId)).await()
+    suspend fun createTimelinePost(post: com.example.snswithai.data.model.TimelinePost) {
+        timelinePostsRef.child(post.postId).setValue(post).await()
     }
 
     suspend fun getTimelinePost(postId: String): TimelinePost? {
         return timelinePostsRef.child(postId).get().await().getValue(TimelinePost::class.java)
     }
 
-    suspend fun updateTimelinePost(post: TimelinePost) {
+    suspend fun updateTimelinePost(post: com.example.snswithai.data.model.TimelinePost) {
         timelinePostsRef.child(post.postId).setValue(post).await()
     }
 
