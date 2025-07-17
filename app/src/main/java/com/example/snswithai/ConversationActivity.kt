@@ -16,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
 import com.google.firebase.ai.type.Content
 import com.google.firebase.ai.type.content
+import android.content.Intent
 
 class ConversationActivity : AppCompatActivity() {
 
@@ -72,6 +73,14 @@ class ConversationActivity : AppCompatActivity() {
                     finish()
                 }
             })
+        // 통화 버튼 클릭 리스너 추가
+        binding.btnCallTheme.setOnClickListener {
+            Intent(this, ConversationActivity_Call::class.java).also { intent ->
+                intent.putExtra("ROOM_KEY", roomKey)
+                intent.putExtra("CHARACTER_KEY", charKey)
+                startActivity(intent)
+            }
+        }
     }
 
     private fun setupConversationFlow(characterName: String) {
