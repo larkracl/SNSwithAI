@@ -73,7 +73,6 @@ class TimelineActivity : AppCompatActivity(), JsonMessageListener {
                     val generatedPostId = newPostRef.key
 
                     val repo = TimelinePostRepository(db)
-                    val postRef = db.getReference("user_data").child("ZCtJmhJKr7RklOwkOjJa2OvunbA3").child("timeline").push()
                     val timelinePost = TimelinePost(
                         postId = "$generatedPostId",
                         author_id = "ai_$aiNumber",
@@ -87,7 +86,7 @@ class TimelineActivity : AppCompatActivity(), JsonMessageListener {
                     // 4. push()로 얻은 참조(newPostRef)에 직접 데이터 저장
                     lifecycleScope.launch(Dispatchers.IO) { // IO Dispatcher 사용 권장 (네트워크 작업)
                         try {
-                            newPostRef.setValue(timelinePost).await() // 코루틴 내에서 비동기 작업 완료 대기
+                            newPostRef.setValue(timelinePost) // 코루틴 내에서 비동기 작업 완료 대기
                             Log.d("TimelineActivity", "New post saved successfully with key: ${newPostRef.key}")
                         } catch (e: Exception) {
                             e.printStackTrace()
