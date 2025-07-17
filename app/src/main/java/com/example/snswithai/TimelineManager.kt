@@ -27,7 +27,7 @@ object TimelineManager {
             "당신은 4번 AI, 모든 것을 알고 있는 박사님입니다. SNS 사용자처럼 짧은 일상 글을 작성해주세요.",
             "당신은 5번 AI, 순수한 어린아이입니다. SNS 사용자처럼 짧은 일상 글을 작성해주세요."
         )
-        val intervals = listOf(30000L, 40000L, 50000L, 60000L, 45000L)
+        val intervals = listOf(100000L, 80000L, 120000L, 60000L, 130000L)
 
         instructions.mapIndexed { index, instruction ->
             TimelineAIConfig(

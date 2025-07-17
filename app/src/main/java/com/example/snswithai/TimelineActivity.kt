@@ -25,13 +25,11 @@ class TimelineActivity : AppCompatActivity(), JsonMessageListener {
         setContentView(binding.root)
 
         JsonDataManager.registerListener(this)
-        TimelineManager.startTimeline()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         JsonDataManager.unregisterListener(this)
-        TimelineManager.stopTimeline()
     }
 
     override fun onNewJsonMessage(json: String) {
