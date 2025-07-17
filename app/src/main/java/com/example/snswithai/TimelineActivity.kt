@@ -78,6 +78,7 @@ class TimelineActivity : AppCompatActivity(), JsonMessageListener {
                         authorName = "AI $aiNumber",
                         content = message,
                         createdAt = System.currentTimeMillis(),
+//                        imgURL = ""
                         likeCount = 0,
                         likedBy = emptyMap()
                     )
