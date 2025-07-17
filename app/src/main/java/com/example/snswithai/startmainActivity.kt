@@ -28,10 +28,10 @@ class StartMainActivity : AppCompatActivity() {
                 .replace(R.id.fragment_container, HomeFragment())
                 .commit()
         }
-        //5번째 버튼
-        findViewById<LinearLayout>(R.id.home).setOnClickListener {
+        // 5번째 버튼: 프로필
+        findViewById<LinearLayout>(R.id.navProfile).setOnClickListener {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, HomeFragment())
+                .replace(R.id.fragment_container, ProfileControllerFragment())
                 .commit()
         }
     }
