@@ -142,7 +142,7 @@ class HomeFragment : Fragment() {
 
     // 기존에 좋아요 된 글인지 확인 후 DB 및 화면 반영
     suspend fun togglePostLike(postId: String, userId: String): Boolean{
-        val postRef = db.getReference("timelinePosts").child(postId)
+        val postRef = db.getReference("user_data").child("ZCtJmhJKr7RklOwkOjJa2OvunbA3").child("timeline").child(postId)
         val snapshot = postRef.get().await()
         val post = snapshot.getValue(TimelinePost::class.java)
 
