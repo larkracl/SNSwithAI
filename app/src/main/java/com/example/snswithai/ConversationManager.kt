@@ -1,6 +1,7 @@
 package com.example.snswithai
 
 import android.util.Log
+import com.google.firebase.ai.type.Content
 import com.google.firebase.ai.type.content
 import kotlinx.coroutines.coroutineScope
 
@@ -10,11 +11,13 @@ import kotlinx.coroutines.coroutineScope
  * 사용자-봇 간의 대화 흐름(startConversation, sendMessage)을 관리합니다.
  */
 class ConversationManager(
-    private val systemPrompt: String
+    private val systemPrompt: String,
+    private val history: List<Content> = emptyList() // history 추가
 ) {
-    // systemPrompt를 그대로 AIService(systemInstruction)로 전달
+    // systemPrompt와 history를 AIService로 전달
     private val aiService = AIService(
-        systemInstruction = content { text(systemPrompt) }
+        systemInstruction = content { text(systemPrompt) },
+        history = history
     )
 
     // 초기 대화가 이미 시작됐는지 추적
