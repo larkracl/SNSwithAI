@@ -84,15 +84,21 @@ class LoginActivity_sm : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
                     val user = auth.currentUser
-                    user?.let { checkUserExistsAndSave(it) }
-                    Toast.makeText(this, "Authentication successful.", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, StartMainActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    user?.let { firebaseUser ->
+                        val uid = firebaseUser.uid // UID 가져오기
+                        checkUserExistsAndSave(firebaseUser) // 기존 데이터베이스 로직
+
+                        Toast.makeText(this, "Authentication successful.", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this, StartMainActivity::class.java)
+                        intent.putExtra("USER_UID", uid) // Intent에 UID 추가
+                        startActivity(intent)
+                        finish()
+                    } ?: run {
+                        // user가 null인 경우 (이론적으로는 task.isSuccessful이면 null이 아니어야 함)
+                        Toast.makeText(this, "Failed to get user information.", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
-                    // If sign in fails, display a message to the user.
                     Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
                 }
             }

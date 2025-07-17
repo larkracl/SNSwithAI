@@ -1,7 +1,9 @@
 package com.example.snswithai
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class StartMainActivity : AppCompatActivity() {
@@ -9,6 +11,17 @@ class StartMainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main2)
+        // Intent에서 UID 받기
+        val receivedUid = intent.getStringExtra("USER_UID")
+
+        if (receivedUid != null) {
+            Log.d("StartMainActivity", "Received UID: $receivedUid")
+            Toast.makeText(this, "User UID: $receivedUid", Toast.LENGTH_LONG).show()
+            // 이 UID를 사용하여 사용자 관련 데이터 로드 또는 다른 작업 수행
+        } else {
+            Log.d("StartMainActivity", "UID not received.")
+            // UID가 없는 경우의 처리 (예: 오류 메시지 표시, 로그인 화면으로 다시 보내기 등)
+        }
 
         if (savedInstanceState == null) { // Activity가 처음 생성될 때만 Fragment를 추가 (화면 회전 등으로 재생성될 때 중복 추가 방지)
             supportFragmentManager.beginTransaction()
