@@ -16,5 +16,5 @@ data class TimelineComment(
     @SerializedName("like_count")
     val likeCount: Int = 0,
     @SerializedName("liked_by")
-    val likedBy: Map<String, Boolean>? = null
+    val likedBy: Map<String, Boolean>? = emptyMap()
 )
