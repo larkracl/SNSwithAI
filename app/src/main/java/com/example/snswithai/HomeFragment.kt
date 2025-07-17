@@ -130,7 +130,7 @@ class HomeFragment : Fragment() {
                     lifecycleScope.launch {
                         val updatedPost = post.copy(
                             content = newContent,
-                            createdAt = System.currentTimeMillis()
+                            created_at = System.currentTimeMillis()
                         )
                         postRepository.updateTimelinePost(updatedPost)
                     }
@@ -147,7 +147,7 @@ class HomeFragment : Fragment() {
         val post = snapshot.getValue(TimelinePost::class.java)
 
         if (post != null) {
-            val likedBy = post.likedBy?.toMutableMap() ?: mutableMapOf()
+            val likedBy = post.liked_by?.toMutableMap() ?: mutableMapOf()
             val alreadyLiked = likedBy.containsKey(userId)
 
             if (alreadyLiked) {

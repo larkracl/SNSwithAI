@@ -39,12 +39,12 @@ class PostAdapter(
         private val heartIcon: ImageView = itemView.findViewById(R.id.icon_heart)
 
         fun bind(post: TimelinePost) {
-            usernameTextView.text = post.authorName
+            usernameTextView.text = post.author_name
             contentTextView.text = post.content
-            heartCountTextView.text = post.likeCount.toString()
+            heartCountTextView.text = post.like_count.toString()
 
             val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-            timeTextView.text = sdf.format(Date(post.createdAt))
+            timeTextView.text = sdf.format(Date(post.created_at))
 
             moreButton.setOnClickListener {
                 showPopupMenu(it, post)

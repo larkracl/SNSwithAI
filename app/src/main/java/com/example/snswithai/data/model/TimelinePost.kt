@@ -4,15 +4,13 @@ import com.google.gson.annotations.SerializedName
 
 // user_data.timeline 내부 객체
 data class TimelinePost(
-    @SerializedName("author_id")
-    val authorId: String = "",
-    @SerializedName("author_name")
-    val authorName: String = "",
+    val postId: String = "",
+    val author_id: String = "",
+    val author_name: String = "",
     val content: String = "",
-    @SerializedName("created_at")
-    val createdAt: Long = 0,
-    @SerializedName("like_count")
-    val likeCount: Int = 0,
-    @SerializedName("liked_by")
-    val likedBy: Map<String, Boolean>? = emptyMap()
+    val created_at: Long = 0,
+    val like_count: Int = 0,
+    val liked_by: Map<String, Boolean>? = emptyMap()
 )
+
+

@@ -68,19 +68,20 @@ class TimelineActivity : AppCompatActivity(), JsonMessageListener {
                     // 이 newPostRef가 "-Nq_Post_Alice_01"와 같은 고유 키를 가진 경로를 가리킴
                     // 예: user_data/{currentUserUid}/timeline/{자동생성된고유키}
                     val newPostRef = userTimelineRef.push()
-                    // (선택사항) 생성된 고유 키를 가져와서 객체 내에도 저장하고 싶다면
-//                    val generatedPostId = newPostRef.key
+                    //(선택사항) 생성된 고유 키를 가져와서 객체 내에도 저장하고 싶다면
+
+                    val generatedPostId = newPostRef.key
 
                     val repo = TimelinePostRepository(db)
                     val postRef = db.getReference("user_data").child("ZCtJmhJKr7RklOwkOjJa2OvunbA3").child("timeline").push()
                     val timelinePost = TimelinePost(
-                        authorId = "ai_$aiNumber",
-                        authorName = "AI $aiNumber",
+                        postId = "$generatedPostId",
+                        author_id = "ai_$aiNumber",
+                        author_name = "AI $aiNumber",
                         content = message,
-                        createdAt = System.currentTimeMillis(),
-//                        imgURL = ""
-                        likeCount = 0,
-                        likedBy = emptyMap()
+                        created_at = System.currentTimeMillis(),
+                        like_count = 0,
+                        liked_by = emptyMap()
                     )
 
                     // 4. push()로 얻은 참조(newPostRef)에 직접 데이터 저장
