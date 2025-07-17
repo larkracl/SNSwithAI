@@ -1,4 +1,3 @@
-// ProfileControllerFragment.kt
 package com.example.snswithai
 
 import android.graphics.BitmapFactory
@@ -20,6 +19,10 @@ class ProfileControllerFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewModel: ProfileViewModel
+
+    // 프래그먼트 인자로 넘어온 UID
+    private val userUid: String?
+        get() = arguments?.getString("USER_UID")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,7 +65,9 @@ class ProfileControllerFragment : Fragment() {
             }
         })
 
-        viewModel.loadProfile()
+        // ★ 변경된 부분: arguments로 넘어온 UID가 있으면 그걸, 없으면 기본값 사용
+        val uidToLoad = userUid ?: "char101"
+        viewModel.loadProfile(uidToLoad)
     }
 
     override fun onDestroyView() {

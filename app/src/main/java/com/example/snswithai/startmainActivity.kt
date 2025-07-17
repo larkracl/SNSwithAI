@@ -48,9 +48,20 @@ class StartMainActivity : AppCompatActivity() {
         }
         // 5번째 버튼: 프로필
         findViewById<LinearLayout>(R.id.navProfile).setOnClickListener {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, ProfileControllerFragment())
-                .commit()
+            // ProfileControllerFragment에 UID를 인자로 넘겨준다
+            val fragment = ProfileControllerFragment().apply {
+                arguments = Bundle().apply {
+                    putString("USER_UID", receivedUid)
+                }
+            }
+
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, ProfileFragment().apply {
+                        arguments = Bundle().apply {
+                                putString("USER_UID", receivedUid)
+                            }
+                    })
+                    .commit()
         }
     }
 }

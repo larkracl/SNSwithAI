@@ -19,8 +19,11 @@ class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
-    // ViewModelProvider 사용
     private lateinit var viewModel: ProfileViewModel
+
+    // ① arguments에서 USER_UID 꺼내기
+    private val userUid: String?
+        get() = arguments?.getString("USER_UID")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,24 +40,24 @@ class ProfileFragment : Fragment() {
         // ViewModel 초기화
         viewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
 
-        // 버튼 클릭 리스너 (기존 로직 그대로)
+        // 버튼 클릭 리스너
         binding.btnBack.setOnClickListener { requireActivity().onBackPressed() }
         binding.btnMore.setOnClickListener { /* TODO: 더보기 로직 */ }
         binding.btnFollow.setOnClickListener { viewModel.toggleFollow() }
         binding.btnMessage.setOnClickListener { /* TODO: 메시지 전송 */ }
         binding.btnEditProfile.setOnClickListener { /* TODO: 프로필 편집 */ }
 
-        // ViewModel 관찰: 기존 프로필 세팅 로직 이동
+        // ViewModel 관찰
         viewModel.profile.observe(viewLifecycleOwner, Observer { profile ->
-            binding.tvUsername.text = profile.name
-            binding.tvKeywords.text = profile.keywords.joinToString(", ")
-            binding.btnFollow.text = if (profile.isFollowing) "언팔로우" else "팔로우"
+            binding.tvUsername.text    = profile.name
+                   binding.tvKeywords.text = profile.description   // ← description 으로 변경
+            binding.btnFollow.text     = if (profile.isFollowing) "언팔로우" else "팔로우"
 
-            // Glide 대신 순수 코루틴+BitmapFactory 로딩 (의존성 없이)
+            // 프로필 이미지 로딩
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
                     val input = URL(profile.imageUrl).openStream()
-                    val bmp = BitmapFactory.decodeStream(input)
+                    val bmp   = BitmapFactory.decodeStream(input)
                     withContext(Dispatchers.Main) {
                         binding.imgProfile.setImageBitmap(bmp)
                     }
@@ -64,8 +67,9 @@ class ProfileFragment : Fragment() {
             }
         })
 
-        // 기존 프로필 로드 호출
-        viewModel.loadProfile()
+        // ③ userUid가 있으면 그걸, 없으면 기본값 넘기기
+        val uidToLoad = userUid ?: "char101"
+        viewModel.loadProfile(uidToLoad)
     }
 
     override fun onDestroyView() {
