@@ -23,9 +23,11 @@ class StartMainActivity : AppCompatActivity() {
             // UID가 없는 경우의 처리 (예: 오류 메시지 표시, 로그인 화면으로 다시 보내기 등)
         }
 
-        if (savedInstanceState == null) { // Activity가 처음 생성될 때만 Fragment를 추가 (화면 회전 등으로 재생성될 때 중복 추가 방지)
+        if (savedInstanceState == null) {
+            // HomeFragment.newInstance()를 사용하여 UID 전달
+            val homeFragment = HomeFragment.newInstance(receivedUid) // receivedUid는 nullable일 수 있음
             supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, HomeFragment()) // R.id.fragment_container를 HomeFragment로 교체
+                .replace(R.id.fragment_container, homeFragment)
                 .commit()
         }
         // "채팅" 탭 클릭 리스너만 남겨둠
