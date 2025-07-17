@@ -86,7 +86,7 @@ class LoginActivity_sm : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     val user = auth.currentUser
-                    user?.let { saveUserToDatabase(it) }
+                    user?.let { checkUserExistsAndSave(it) }
                     Toast.makeText(this, "Authentication successful.", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, IntermediateActivity::class.java)
                     startActivity(intent)
@@ -96,6 +96,20 @@ class LoginActivity_sm : AppCompatActivity() {
                     Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show()
                 }
             }
+    }
+
+    private fun checkUserExistsAndSave(firebaseUser: com.google.firebase.auth.FirebaseUser) {
+        val dbRef = FirebaseDatabase.getInstance().getReference("users").child(firebaseUser.uid)
+        dbRef.get().addOnSuccessListener { dataSnapshot ->
+            if (!dataSnapshot.exists()) {
+                // User does not exist, save them to the database
+                saveUserToDatabase(firebaseUser)
+            }
+            // If user exists, do nothing.
+        }.addOnFailureListener{
+            // Handle the error
+            Toast.makeText(this, "Failed to check user existence: ${it.message}", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun saveUserToDatabase(firebaseUser: com.google.firebase.auth.FirebaseUser) {
@@ -108,7 +122,7 @@ class LoginActivity_sm : AppCompatActivity() {
 
         db.getReference("users").child(firebaseUser.uid)
             .setValue(user)
-            .addOnSuccessListener { 
+            .addOnSuccessListener {
                 // Optional: Handle success, e.g., log or show a toast
             }
             .addOnFailureListener { e ->
