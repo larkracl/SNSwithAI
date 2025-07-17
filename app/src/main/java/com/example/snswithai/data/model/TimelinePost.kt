@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 // user_data.timeline 내부 객체
 data class TimelinePost(
+    val postId: String = "",
     @SerializedName("author_id")
     val authorId: String = "",
     @SerializedName("author_name")
