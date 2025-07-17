@@ -88,6 +88,12 @@ class HomeFragment : Fragment() {
 
         observePosts()
 
+        val fabAddPost = view.findViewById<View>(R.id.fab_add_post)
+        fabAddPost.setOnClickListener {
+            val intent = Intent(requireContext(), PostCreateActivity::class.java)
+            startActivity(intent)
+        }
+
         return view
     }
 

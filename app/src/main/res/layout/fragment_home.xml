@@ -34,6 +34,21 @@
             android:paddingHorizontal="16dp"
             android:clipToPadding="false"
             android:paddingBottom="8dp"/>
+
+        <!-- 우측 하단 Floating Action Button -->
+        <ImageButton
+            android:id="@+id/fab_add_post"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:backgroundTint="#77AA77"
+            android:background="@drawable/bg_fab"
+            android:src="@drawable/ic_add"
+            android:tint="@android:color/white"
+            android:contentDescription="글 작성"
+            android:elevation="6dp" />
+
     </LinearLayout>
 
     <LinearLayout

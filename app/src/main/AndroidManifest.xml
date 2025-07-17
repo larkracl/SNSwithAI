@@ -36,6 +36,7 @@
         <activity android:name=".StartMainActivity">
         </activity>
         <activity android:name=".PostDetailActivity" />
+        <activity android:name=".PostCreateActivity" />
 
     </application>
 
