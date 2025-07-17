@@ -19,11 +19,6 @@
         <activity
             android:name=".StartMainActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".NewActivity_sm" />
         <activity android:name=".MainActivity" />
@@ -33,6 +28,14 @@
         <activity android:name=".CharacterSelectionActivity" />
         <activity android:name=".ConversationActivity_Call"/>
         <activity android:name=".IntermediateActivity"/>
+        <activity android:name=".LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

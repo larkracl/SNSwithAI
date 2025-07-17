@@ -15,7 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
 
-class LoginActivity_sm : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
 
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
@@ -46,8 +46,7 @@ class LoginActivity_sm : AppCompatActivity() {
             // For demonstration purposes, a simple hardcoded check
             if (email == "test@example.com" && password == "password123") {
                 Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, IntermediateActivity::class.java)
-                startActivity(intent)
+                startmainActivity()
                 finish() // Close LoginActivity so user can't go back to it
             } else {
                 Toast.makeText(this, "Invalid Credentials", Toast.LENGTH_SHORT).show()
@@ -88,8 +87,7 @@ class LoginActivity_sm : AppCompatActivity() {
                     val user = auth.currentUser
                     user?.let { saveUserToDatabase(it) }
                     Toast.makeText(this, "Authentication successful.", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, IntermediateActivity::class.java)
-                    startActivity(intent)
+                    startmainActivity()
                     finish()
                 } else {
                     // If sign in fails, display a message to the user.
@@ -115,5 +113,10 @@ class LoginActivity_sm : AppCompatActivity() {
                 // Optional: Handle failure
                 Toast.makeText(this, "Failed to save user data: ${e.message}", Toast.LENGTH_LONG).show()
             }
+    }
+
+    private fun startmainActivity() {
+        val intent = Intent(this, StartMainActivity::class.java)
+        startActivity(intent)
     }
 }
