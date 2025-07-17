@@ -80,10 +80,15 @@ class ChatListFragment : Fragment(R.layout.fragment_chatlist) {
                                         ?: return@setOnClickListener
                                 }
 
-                                // 6) ConversationActivity로 키 전달
-                                val intent = Intent(requireContext(), ConversationActivity::class.java)
-                                    .apply { putExtra("CHARACTER_KEY", characterKey) }
-                                startActivity(intent)
+                                                               // 6) ConversationActivity로 키 전달
+
+                                                               // 6) ConversationActivity로 roomKey와 characterKey 함께 전달
+                                                               val intent = Intent(requireContext(), ConversationActivity::class.java)
+                                                                   .apply {
+                                                                           putExtra("ROOM_KEY", roomKey)
+                                                                           putExtra("CHARACTER_KEY", characterKey)
+                                                                       }
+                                                               startActivity(intent)
                             }
                         }
 
