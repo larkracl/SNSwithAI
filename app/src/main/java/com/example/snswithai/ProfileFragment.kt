@@ -5,11 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.snswithai.databinding.FragmentProfileBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,58 +25,102 @@ import java.net.URL
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
-
     private lateinit var viewModel: ProfileViewModel
-
-    // ① arguments에서 USER_UID 꺼내기
-    private val userUid: String?
-        get() = arguments?.getString("USER_UID")
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentProfileBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    ) = FragmentProfileBinding.inflate(inflater, container, false)
+        .also { _binding = it }
+        .root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ViewModel 초기화
+        // 1) UID 가져오기 (args or auth)
+        val uidFromArgs = arguments?.getString("USER_UID")
+        val uidFromAuth = FirebaseAuth.getInstance().uid
+        val uidToLoad = uidFromArgs ?: uidFromAuth
+
+        if (uidToLoad.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "사용자 UID를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
+            parentFragmentManager.popBackStack()
+            return
+        }
+
+        // 2) ViewModel 초기화 및 프로필 load
         viewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
+        viewModel.loadProfile(uidToLoad)
 
-        // 버튼 클릭 리스너
-        binding.btnBack.setOnClickListener { requireActivity().onBackPressed() }
-        binding.btnMore.setOnClickListener { /* TODO: 더보기 로직 */ }
-        binding.btnFollow.setOnClickListener { viewModel.toggleFollow() }
-        binding.btnMessage.setOnClickListener { /* TODO: 메시지 전송 */ }
-        binding.btnEditProfile.setOnClickListener { /* TODO: 프로필 편집 */ }
+        // 3) 프로필 데이터 관찰
+        viewModel.profile.observe(viewLifecycleOwner) { profile ->
+            binding.tvUsername.text = profile.name
+            binding.tvKeywords.text = profile.description
+            binding.btnFollow.text = if (profile.isFollowing) "언팔로우" else "팔로우"
 
-        // ViewModel 관찰
-        viewModel.profile.observe(viewLifecycleOwner, Observer { profile ->
-            binding.tvUsername.text    = profile.name
-                   binding.tvKeywords.text = profile.description   // ← description 으로 변경
-            binding.btnFollow.text     = if (profile.isFollowing) "언팔로우" else "팔로우"
-
-            // 프로필 이미지 로딩
+            // 프로필 이미지 로딩 (코루틴+BitmapFactory)
             lifecycleScope.launch(Dispatchers.IO) {
-                try {
+                runCatching {
                     val input = URL(profile.imageUrl).openStream()
-                    val bmp   = BitmapFactory.decodeStream(input)
+                    BitmapFactory.decodeStream(input)
+                }.onSuccess { bmp ->
                     withContext(Dispatchers.Main) {
                         binding.imgProfile.setImageBitmap(bmp)
                     }
-                } catch (_: Exception) {
-                    // placeholder 처리 등
                 }
             }
-        })
 
-        // ③ userUid가 있으면 그걸, 없으면 기본값 넘기기
-        val uidToLoad = userUid ?: "char101"
-        viewModel.loadProfile(uidToLoad)
+            // 4) 내 타임라인만 필터링해서 RecyclerView로
+            val timelineRef = Firebase
+                .database("https://snswithai-29d1f-default-rtdb.asia-southeast1.firebasedatabase.app")
+                .getReference("user_data")
+                .child(uidToLoad)
+                .child("timeline")
+
+            timelineRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val list = snapshot.children.mapNotNull { node ->
+                        node.child("author_id").getValue(String::class.java)
+                            .takeIf { it == uidToLoad }
+                            ?.let {
+                                TimelinePost(
+                                    authorName     = profile.name,
+                                    authorImageUrl = profile.imageUrl,
+                                    content        = node.child("content")
+                                        .getValue(String::class.java)
+                                        .orEmpty(),
+                                    createdAt      = node.child("created_at")
+                                        .getValue(Long::class.java)
+                                        ?: 0L,
+                                    likeCount      = node.child("like_count")
+                                        .getValue(Long::class.java)
+                                        ?.toInt() ?: 0,
+                                    commentCount   = node.child("comment_count")
+                                        .getValue(Long::class.java)
+                                        ?.toInt() ?: 0
+                                )
+                            }
+                    }
+
+                    binding.recyclerPosts.apply {
+                        layoutManager = LinearLayoutManager(requireContext())
+                        adapter = TimelineAdapter(list)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(requireContext(), "타임라인 로드 실패", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+
+        // 5) 버튼 리스너
+        binding.btnBack.setOnClickListener    { parentFragmentManager.popBackStack() }
+        binding.btnMore.setOnClickListener    { /* TODO */ }
+        binding.btnFollow.setOnClickListener  { viewModel.toggleFollow() }
+        binding.btnMessage.setOnClickListener { /* TODO */ }
+        binding.btnEditProfile.setOnClickListener { /* TODO */ }
     }
 
     override fun onDestroyView() {
