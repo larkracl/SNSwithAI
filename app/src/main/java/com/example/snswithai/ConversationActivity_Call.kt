@@ -2,10 +2,15 @@ package com.example.snswithai
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.media.AudioAttributes
+import android.media.AudioFormat
+import android.media.AudioManager
 import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
 import android.view.View
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -20,10 +25,14 @@ import com.google.firebase.ai.type.content
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import android.widget.TextView
-
 
 class ConversationActivity_Call : AppCompatActivity() {
+
+    companion object {
+        // 하드코딩된 Eleven Labs API 키와 Voice ID
+        private const val ELEVEN_LABS_API_KEY = "sk_f461177ce2f5907ce7f8439d03dfdb9d885732d088b6613f"
+        private const val CUSTOM_VOICE_ID     = "yWgKxYsEV963gbBj3E4Z"
+    }
 
     private lateinit var binding: ActivityConversationCallBinding
     private lateinit var sttManager: STTManager
@@ -43,32 +52,38 @@ class ConversationActivity_Call : AppCompatActivity() {
         binding = ActivityConversationCallBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 1) Chronometer 시작 (한 번만)
+        // TTS/STT 미리 초기화
+        initTts()
+        initStt()
+
+        // Chronometer 시작
         binding.chronometer.base = SystemClock.elapsedRealtime()
         binding.chronometer.start()
 
-        // 2) 버튼 리스너 초기화
         initButtons()
+        loadCharacterFromFirebase()
+    }
 
-        // 3) Firebase에서 캐릭터 정보 로드
+    /** Firebase에서 캐릭터 정보 로드 후 UI, AI 서비스 초기화 */
+    private fun loadCharacterFromFirebase() {
         Firebase.database
             .getReference("characters/char101")
             .get()
             .addOnSuccessListener { snap: DataSnapshot ->
                 currentChar = snap.getValue(Character::class.java) ?: Character()
-                initUi()
-                initAiService()
-                initTts()
-                initStt()
+                onCharacterReady()
             }
             .addOnFailureListener { e ->
                 Log.e("ConversationActivity_Call", "char101 load failed", e)
                 currentChar = Character()
-                initUi()
-                initAiService()
-                initTts()
-                initStt()
+                onCharacterReady()
             }
+    }
+
+    /** 캐릭터 로딩 완료 시점에 호출 */
+    private fun onCharacterReady() {
+        initUi()
+        initAiService()
     }
 
     private fun initUi() {
@@ -84,7 +99,7 @@ class ConversationActivity_Call : AppCompatActivity() {
         val systemPrompt = buildString {
             append("당신은 ${currentChar.name} (나이 ${currentChar.age}, 취미 ${currentChar.hobby}) 입니다. ")
             append("${currentChar.description}. ")
-            append("성격 특성: ${currentChar.personality}.")
+            append("성격 특성: ${currentChar.personality}. ")
             append("응답에는 이모티콘이나 별표(*) 같은 특수문자, 마크다운 문법을 포함하지 말고, ")
             append("자연스럽고 간결한 한국어 문장만 사용하세요.")
         }
@@ -92,14 +107,17 @@ class ConversationActivity_Call : AppCompatActivity() {
             systemInstruction = content { text(systemPrompt) }
         )
     }
+
+    /** TTS 매니저 초기화 */
     private fun initTts() {
         ttsManager = TtsManager(
             context = this,
-            apiKey   = BuildConfig.ELEVEN_LABS_API_KEY as String,
-            voiceId  = currentChar.voiceID
+            apiKey   = ELEVEN_LABS_API_KEY,
+            voiceId  = CUSTOM_VOICE_ID
         )
     }
 
+    /** STT 매니저 초기화 */
     private fun initStt() {
         sttManager = STTManager(
             context = this,
@@ -109,16 +127,12 @@ class ConversationActivity_Call : AppCompatActivity() {
                     sendMessageToAi(text)
                 }
             },
-            onRms = { /* 빈 람다 */ }
+            onRms = { /* 비사용 */ }
         )
     }
 
     private fun initButtons() {
-        // 뒤로가기 버튼
-        binding.btnBack.setOnClickListener {
-            finish()
-        }
-        // 텍스트 전송 버튼
+        binding.btnBack.setOnClickListener { finish() }
         binding.sendButton.setOnClickListener {
             val txt = binding.messageInput.text.toString().trim()
             if (txt.isNotEmpty()) {
@@ -127,8 +141,12 @@ class ConversationActivity_Call : AppCompatActivity() {
                 binding.messageInput.text?.clear()
             }
         }
-        // 음성 입력 버튼
+
         binding.btnMic.setOnClickListener {
+            if (!::sttManager.isInitialized) {
+                Toast.makeText(this, "잠시만 기다려주세요…", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             if (ContextCompat.checkSelfPermission(
                     this, Manifest.permission.RECORD_AUDIO
                 ) != PackageManager.PERMISSION_GRANTED
@@ -138,18 +156,15 @@ class ConversationActivity_Call : AppCompatActivity() {
                 sttManager.startListening()
             }
         }
-        // 통화 종료 버튼
+
         binding.btnEndCall.setOnClickListener {
             ttsManager.destroy()
-            // 타이머 정지
             binding.chronometer.stop()
-            // 요약 다이얼로그 표시
             showCallSummaryDialog()
         }
     }
 
     private fun showCallSummaryDialog() {
-        // 1) 통화 시간 계산 (기존 코드)
         val elapsed  = SystemClock.elapsedRealtime() - binding.chronometer.base
         val hours    = (elapsed / 3_600_000).toInt()
         val minutes  = ((elapsed % 3_600_000) / 60_000).toInt()
@@ -159,13 +174,9 @@ class ConversationActivity_Call : AppCompatActivity() {
             append(String.format("%02d분 %02d초", minutes, seconds))
         }
 
-        // 2) 전체 대화 로그
         val fullLog = binding.conversationLog.text.toString()
-
-        // 3) 요약용 프롬프트 (이후 사용)
         val prompt = "다음은 사용자와 AI의 대화입니다. 요약해주세요:\n\n$fullLog"
 
-        // 4) AI 호출
         CoroutineScope(Dispatchers.Main).launch {
             val summary = try {
                 aiService.generateContent(prompt)
@@ -173,31 +184,39 @@ class ConversationActivity_Call : AppCompatActivity() {
                 "요약 중 오류 발생"
             }
 
-            // 5) 다이얼로그용 뷰 인플레이트
             val dialogView = layoutInflater.inflate(
                 R.layout.dialog_call_summary, null
             )
-            // 6) 뷰에 값 세팅
             dialogView.findViewById<TextView>(R.id.tvCallDuration).text = "통화 시간: $durationText"
             dialogView.findViewById<TextView>(R.id.tvCallSummary).text  = summary
 
-            // 7) 다이얼로그 띄우기
             AlertDialog.Builder(this@ConversationActivity_Call)
                 .setView(dialogView)
-                .setPositiveButton("확인") { _, _ ->
-                    finish()
-                }
+                .setPositiveButton("확인") { _, _ -> finish() }
                 .setCancelable(false)
                 .show()
         }
     }
 
-
     private fun sendMessageToAi(prompt: String) {
         CoroutineScope(Dispatchers.Main).launch {
-            val response = aiService.generateContent(prompt)
+            val response = try {
+                aiService.generateContent(prompt)
+            } catch (e: Exception) {
+                Log.e("ConversationActivity_Call", "AI generate error", e)
+                "죄송해요, 응답을 가져오지 못했어요."
+            }
+
             appendLog("AI: $response")
-            ttsManager.speak(response)
+
+            // TTS는 IO 스레드에서 실행하며 예외 로깅
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    ttsManager.speak(response)
+                } catch (e: Exception) {
+                    Log.e("ConversationActivity_Call", "TTS speak error", e)
+                }
+            }
         }
     }
 
@@ -209,7 +228,7 @@ class ConversationActivity_Call : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         binding.chronometer.stop()
-        sttManager.destroy()
+        if (::sttManager.isInitialized) sttManager.destroy()
         ttsManager.destroy()
     }
 }
