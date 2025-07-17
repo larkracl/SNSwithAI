@@ -20,7 +20,7 @@ class AIService(
         }
 
         val model = Firebase.ai.generativeModel(
-            modelName = "gemini-2.5-flash",
+            modelName = "gemini-2.5-flash-lite-preview-06-17",
             generationConfig = generationConfig,
             systemInstruction = systemInstruction
         )
