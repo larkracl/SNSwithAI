@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        tools:context=".CharacterSelectionActivity">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:text="대화할 AI를 선택하세요"
+            android:textSize="24sp" />
+
+        <Button
+            android:id="@+id/character1_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1번 AI: 친절한 설명가" />
+
+        <Button
+            android:id="@+id/character2_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2번 AI: 츤데레" />
+
+        <Button
+            android:id="@+id/character3_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3번 AI: 유쾌한 친구" />
+
+        <Button
+            android:id="@+id/character4_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="4번 AI: 박사님" />
+
+        <Button
+            android:id="@+id/character5_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="5번 AI: 순수한 아이" />
+
+    </LinearLayout>
+</layout>

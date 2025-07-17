@@ -1,104 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#FAFBF9"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".LoginActivity">
 
-    <!-- 상단 우측 퀘스천 아이콘 -->
-    <ImageButton
-        android:id="@+id/btnQuestion"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="16dp"
-        android:background="@null"
-        android:src="@android:drawable/ic_menu_help"
-        android:contentDescription="Help"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- 제목: Welcome back -->
-    <TextView
-        android:id="@+id/tvWelcome"
-        android:layout_width="0dp"
+    <EditText
+        android:id="@+id/editTextEmail"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Welcome back"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:textColor="#131910"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/btnQuestion"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
-
-    <!-- Email 입력창 -->
-    <EditText
-        android:id="@+id/etEmail"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="24dp"
         android:hint="Email"
-        android:padding="16dp"
-        android:background="@drawable/bg_input"
-        android:textColor="#131910"
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/tvWelcome"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:inputType="textEmailAddress" />
 
-    <!-- Password 입력창 -->
     <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
+        android:id="@+id/editTextPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:hint="Password"
-        android:padding="16dp"
-        android:background="@drawable/bg_input"
-        android:textColor="#131910"
-        android:textSize="16sp"
-        android:inputType="textPassword"
-        app:layout_constraintTop_toBottomOf="@id/etEmail"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:inputType="textPassword" />
 
-    <!-- Forgot password 링크 -->
-    <TextView
-        android:id="@+id/tvForgot"
+    <Button
+        android:id="@+id/buttonLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
-        android:text="Forgot password?"
-        android:textSize="14sp"
-        android:textColor="#6D8E57"
-        android:clickable="true"
-        app:layout_constraintTop_toBottomOf="@id/etPassword"
-        app:layout_constraintStart_toStartOf="parent"/>
+        android:text="Login" />
 
-    <!-- Sign In 버튼 -->
-    <Button
-        android:id="@+id/btnSignIn"
-        android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="24dp"
-        android:text="Sign In"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="#131910"
-        android:background="@drawable/bg_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/googleSignInButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
