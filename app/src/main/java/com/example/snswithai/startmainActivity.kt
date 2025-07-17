@@ -28,5 +28,11 @@ class StartMainActivity : AppCompatActivity() {
                 .replace(R.id.fragment_container, HomeFragment())
                 .commit()
         }
+        //5번째 버튼
+        findViewById<LinearLayout>(R.id.home).setOnClickListener {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, HomeFragment())
+                .commit()
+        }
     }
 }

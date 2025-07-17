@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,7 +24,7 @@ class ChatListFragment : Fragment(R.layout.fragment_chatlist) {
         rvChatRooms = view.findViewById(R.id.rv_chat_rooms)
         rvChatRooms.layoutManager = LinearLayoutManager(requireContext())
 
-        // TODO: 실제 로그인된 userId 로 바꾸세요
+        // TODO: 실제 로그인된 userId로 대체하세요
         val currentUserId = "ZCtJmhJKr7RklOwkOjJa2OvunbA3"
 
         FirebaseDatabase.getInstance()
@@ -56,39 +57,57 @@ class ChatListFragment : Fragment(R.layout.fragment_chatlist) {
                         }
 
                         override fun onBindViewHolder(holder: RoomViewHolder, position: Int) {
+                            val roomKey = roomKeys[position]
                             holder.tvName.text = roomNames[position]
 
+                            // 기본 플레이스홀더 세팅
+                            holder.ivAvatar.setImageResource(R.drawable.ic_profile_placeholder)
+
+                            // 4) 방 멤버 중 첫 번째 char 키 찾기
+                            val membersNode = snapshot
+                                .child("chat_room_members")
+                                .child(roomKey)
+                            val characterKey = membersNode.children
+                                .mapNotNull { it.key }
+                                .firstOrNull { it.startsWith("char") }
+                                .orEmpty()
+
+                            // 5) 캐릭터 정보에서 로컬 drawable 경로(imageURL) 가져와 세팅
+                            if (characterKey.isNotEmpty()) {
+                                FirebaseDatabase.getInstance()
+                                    .reference
+                                    .child("characters")
+                                    .child(characterKey)
+                                    .child("imageURL")
+                                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                                        override fun onDataChange(ds: DataSnapshot) {
+                                            val path = ds.getValue(String::class.java)
+                                            if (!path.isNullOrEmpty()) {
+                                                // "@drawable/your_image_name"에서 "your_image_name" 추출
+                                                val resName = path.substringAfter("/")
+
+                                                // 리소스 ID 얻기
+                                                val resId = holder.ivAvatar.context.resources
+                                                    .getIdentifier(resName, "drawable", holder.ivAvatar.context.packageName)
+
+                                                if (resId != 0) {
+                                                    holder.ivAvatar.setImageResource(resId)
+                                                }
+                                            }
+                                        }
+                                        override fun onCancelled(error: DatabaseError) {
+                                            // 로드 실패 시 기본 이미지 유지
+                                        }
+                                    })
+                            }
+
+                            // 6) 클릭 시 ConversationActivity로 이동
                             holder.itemView.setOnClickListener {
-                                val roomKey = roomKeys[position]
-
-                                // 4) 방 멤버 중 첫 번째 키 가져오기
-                                val membersNode = snapshot
-                                    .child("chat_room_members")
-                                    .child(roomKey)
-                                val firstKey = membersNode.children
-                                    .mapNotNull { it.key }
-                                    .firstOrNull()
-                                    ?: return@setOnClickListener
-
-                                // 5) 캐릭터 키 결정 (char로 시작하지 않으면 다음 찾기)
-                                val characterKey = if (firstKey.startsWith("char")) {
-                                    firstKey
-                                } else {
-                                    membersNode.children
-                                        .mapNotNull { it.key }
-                                        .firstOrNull { it.startsWith("char") }
-                                        ?: return@setOnClickListener
+                                Intent(requireContext(), ConversationActivity::class.java).also { intent ->
+                                    intent.putExtra("ROOM_KEY", roomKey)
+                                    intent.putExtra("CHARACTER_KEY", characterKey)
+                                    startActivity(intent)
                                 }
-
-                                                               // 6) ConversationActivity로 키 전달
-
-                                                               // 6) ConversationActivity로 roomKey와 characterKey 함께 전달
-                                                               val intent = Intent(requireContext(), ConversationActivity::class.java)
-                                                                   .apply {
-                                                                           putExtra("ROOM_KEY", roomKey)
-                                                                           putExtra("CHARACTER_KEY", characterKey)
-                                                                       }
-                                                               startActivity(intent)
                             }
                         }
 
@@ -103,6 +122,7 @@ class ChatListFragment : Fragment(R.layout.fragment_chatlist) {
     }
 
     private class RoomViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvName: TextView = itemView.findViewById(R.id.tv_name)
+        val ivAvatar: ImageView = itemView.findViewById(R.id.iv_avatar)
+        val tvName:  TextView   = itemView.findViewById(R.id.tv_name)
     }
 }
