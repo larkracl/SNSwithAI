@@ -52,7 +52,7 @@ class ConversationActivity_Call : AppCompatActivity() {
 
         // 3) Firebase에서 캐릭터 정보 로드
         Firebase.database
-            .getReference("characters/char102")
+            .getReference("characters/char101")
             .get()
             .addOnSuccessListener { snap: DataSnapshot ->
                 currentChar = snap.getValue(Character::class.java) ?: Character()

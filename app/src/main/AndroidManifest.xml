@@ -17,11 +17,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SNSwithAI">
         <activity
-            android:name=".LoginActivity_sm"
-            android:exported="false">
-
-        </activity>
-        <activity android:name=".NewActivity_sm" android:exported="true">
+            android:name=".StartMainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
