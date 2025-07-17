@@ -22,16 +22,38 @@ import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+
+
 class HomeFragment : Fragment() {
 
+    private var currentUid: String = "" // UID를 저장할 변수
     private lateinit var recyclerView: RecyclerView
     private lateinit var postAdapter: PostAdapter
     private val postList = mutableListOf<TimelinePost>()
 
     private val db = FirebaseDatabase.getInstance()
     private val postRepository = TimelinePostRepository(db)
+
     private val auth = FirebaseAuth.getInstance()
 
+    companion object {
+        private const val ARG_UID = "user_uid" // Bundle 키 정의
+
+        fun newInstance(uid: String?): HomeFragment {
+            val fragment = HomeFragment()
+            val args = Bundle()
+            args.putString(ARG_UID, uid) // Bundle에 UID 저장
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            currentUid = it.getString(ARG_UID).toString() // Bundle에서 UID 읽기
+        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -65,7 +87,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun observePosts() {
-        val postsRef = db.getReference("timelinePosts")
+        val postsRef = db.getReference("user_data").child("ZCtJmhJKr7RklOwkOjJa2OvunbA3").child("timeline")
+        //ZCtJmhJKr7RklOwkOjJa2OvunbA3 : 이주영 or currentUid
+        Log.d("DBTEST", "Firebase Data: $postsRef")
         postsRef.orderByChild("created_at").addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 // 포스트 리스트 초기화
