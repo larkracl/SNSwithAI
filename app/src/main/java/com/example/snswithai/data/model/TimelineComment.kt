@@ -3,6 +3,8 @@ package com.example.snswithai.data.model
 import com.google.gson.annotations.SerializedName
 
 data class TimelineComment(
+    val postId: String = "", // Add postId
+    val commentId: String = "", // Add commentId
     @SerializedName("author_id")
     val authorId: String = "",
     @SerializedName("author_name")
