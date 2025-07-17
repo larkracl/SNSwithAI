@@ -1,61 +1,65 @@
 package com.example.snswithai
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.Button
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import android.util.Log
 
-class DbTestActivity : AppCompatActivity() {
+class DbTestFragment : Fragment(R.layout.fragment_db_test) {
 
     private lateinit var tvDbOutput: TextView
+    private lateinit var btnStartMain: Button
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_db_test)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        tvDbOutput = findViewById(R.id.tvDbOutput)
+        tvDbOutput = view.findViewById(R.id.tvDbOutput)
+        btnStartMain = view.findViewById(R.id.btnStartMain)
 
-        // 데이터베이스 인스턴스 가져오기
-        val database = FirebaseDatabase.getInstance()
-        val rootRef = database.reference
+        // 1) Firebase 데이터 읽기
+        FirebaseDatabase.getInstance()
+            .reference
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val json = snapshotToJson(snapshot)
+                    tvDbOutput.text = json
+                    Log.d("DBTEST", json)
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    tvDbOutput.text = "데이터 로드 실패: ${error.message}"
+                    Log.w("DBTEST", "Failed to read.", error.toException())
+                }
+            })
 
-        // 한 번만 읽어오기
-        rootRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                // 전체 데이터를 JSON 형태로 변환해서 출력
-                val allData = snapshotToJson(snapshot)
-                tvDbOutput.text = allData
-                Log.d("DBTEST", allData)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                tvDbOutput.text = "데이터 로드 실패: ${error.message}"
-                Log.w("DBTEST", "Failed to read value.", error.toException())
-            }
-        })
+        // 2) 버튼 클릭 시 StartMainActivity 호출
+        btnStartMain.setOnClickListener {
+            val intent = Intent(requireContext(), StartMainActivity::class.java)
+            startActivity(intent)
+        }
     }
 
-    // DataSnapshot을 JSON 스타일 문자열로 변환하는 재귀 함수
+    //--- DataSnapshot → JSON 변환 함수
     private fun snapshotToJson(snapshot: DataSnapshot, indent: String = ""): String {
-        val builder = StringBuilder()
+        val sb = StringBuilder()
         if (snapshot.hasChildren()) {
-            builder.append("$indent\"${snapshot.key}\": {\n")
-            val childIndent = indent + "  "
+            sb.append("$indent\"${snapshot.key}\": {\n")
+            val childIndent = "$indent  "
             val children = snapshot.children.toList()
-            children.forEachIndexed { index, child ->
-                builder.append(snapshotToJson(child, childIndent))
-                if (index < children.lastIndex) builder.append(",\n")
-                else builder.append("\n")
+            children.forEachIndexed { idx, child ->
+                sb.append(snapshotToJson(child, childIndent))
+                sb.append(if (idx < children.lastIndex) ",\n" else "\n")
             }
-            builder.append("$indent}")
+            sb.append("$indent}")
         } else {
-            // Leaf node: key: value
-            builder.append("$indent\"${snapshot.key}\": \"${snapshot.value}\"")
+            sb.append("$indent\"${snapshot.key}\": \"${snapshot.value}\"")
         }
-        return builder.toString()
+        return sb.toString()
     }
 }
